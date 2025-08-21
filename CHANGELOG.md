@@ -29,7 +29,7 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 - Comprehensive unit tests covering all scenarios
 - MIT License
 
-## [1.0.0] - 2024-08-22
+## [1.0.0+1] - 2024-08-22
 
 ### Released
 - Initial release of CatchingJosh package
