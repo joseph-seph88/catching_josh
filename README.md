@@ -1,14 +1,13 @@
-# catching_js
+# catching_josh
 
 **Author:** Joseph88  
 **Version:** 1.0.0  
 **License:** MIT
-**Git** https://github.com/joseph-seph88/
+**Git** https://github.com/joseph-seph88/catching_josh
 
 > A package developed to minimize repetitive use of try-catch statements, designed with the goal of simple and intuitive usability.
-> try-catch 구문의 반복 사용을 최소화하기 위해 개발된 패키지로, 간편하고 직관적인 사용성을 목표로 설계되었습니다.
 
-[![pub package](https://img.shields.io/pub/v/catching_js.svg)](https://pub.dev/packages/catching_js)
+[![pub package](https://img.shields.io/pub/v/catching_josh.svg)](https://pub.dev/packages/catching_josh)
 [![License](https://img.shields.io/badge/license-MIT-blue.svg)](LICENSE)
 
 ---
@@ -17,18 +16,18 @@
 
 ```yaml
 dependencies:
-  catching_js: ^1.0.0
+  catching_josh: ^1.0.0
 ```
 
 ## Quick Start
 
 ```dart
-import 'package:catching_js/catching_js.dart';
+import 'package:catching_josh/catching_josh.dart';
 
 // Basic usage examples
-final result = js(() => riskyOperation());
-final data = await jsAsync(() async => await api.getData());
-jsVoid(() => storage.save(key, value));
+final result = josh(() => riskyOperation());
+final data = await joshAsync(() async => await api.getData());
+joshVoid(() => storage.save(key, value));
 ```
 
 ## Usage Guide
@@ -36,8 +35,8 @@ jsVoid(() => storage.save(key, value));
 ### 1. Synchronous Operations
 ```dart
 // Handle sync operations with error logging
-final user = js(() => parseUser(jsonString));
-final data = js(() => complexCalculation());
+final user = josh(() => parseUser(jsonString));
+final data = josh(() => complexCalculation());
 ```
 
 ### 2. Asynchronous Operations
@@ -66,7 +65,7 @@ jsVoid(() => cache.clear());
 ### 5. With Context
 ```dart
 // Add context for better debugging
-final result = js(
+final result = josh(
   () => complexOperation(),
   context: 'User authentication process',
 );
@@ -82,13 +81,13 @@ final data = await jsAsync(
 ### Basic Error Handling
 ```dart
 // Default behavior: log error and return null
-final data1 = js(() => riskyOperation());
+final data1 = josh(() => riskyOperation());
 
 // Log error and throw
-final data2 = js(() => riskyOperation(), returnType: 'throw');
+final data2 = josh(() => riskyOperation(), returnType: 'throw');
 
 // Log error and rethrow (preserves stack trace)
-final data3 = js(() => riskyOperation(), returnType: 'rethrow');
+final data3 = josh(() => riskyOperation(), returnType: 'rethrow');
 ```
 
 ### Real-world Scenarios
@@ -100,7 +99,7 @@ final user = await jsAsync(
 );
 
 // JSON parsing with error handling
-final data = js(
+final data = josh(
   () => jsonDecode(jsonString),
   context: 'Parsing API response',
 );

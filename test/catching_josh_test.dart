@@ -1,50 +1,50 @@
 import 'package:flutter_test/flutter_test.dart';
-import 'package:catching_js/catching_js.dart';
+import 'package:catching_josh/catching_josh.dart';
 
 void main() {
-  group('JS Functions Tests', () {
-    test('js() - sync operation with null return', () {
-      final result = js(() {
+  group('Josh Functions Tests', () {
+    test('josh() - sync operation with null return', () {
+      final result = josh(() {
         throw Exception('Test error');
       });
 
       expect(result, isNull);
     });
 
-    test('js() - sync operation with throw return', () {
+    test('josh() - sync operation with throw return', () {
       expect(() {
-        js(
+        josh(
           () => throw Exception('Test error'),
           returnType: 'throw',
         );
       }, throwsA(isA<Exception>()));
     });
 
-    test('js() - sync operation with rethrow return', () {
+    test('josh() - sync operation with rethrow return', () {
       expect(() {
-        js(
+        josh(
           () => throw Exception('Test error'),
           returnType: 'rethrow',
         );
       }, throwsA(isA<Exception>()));
     });
 
-    test('js() - sync operation with exception return', () {
+    test('josh() - sync operation with exception return', () {
       expect(() {
-        js(
+        josh(
           () => throw Exception('Test error'),
           returnType: 'exception',
         );
       }, throwsA(isA<Exception>()));
     });
 
-    test('js() - successful sync operation', () {
-      final result = js(() => 'success');
+    test('josh() - successful sync operation', () {
+      final result = josh(() => 'success');
       expect(result, equals('success'));
     });
 
     test('jsAsync() - async operation with null return', () async {
-      final result = await jsAsync(() async {
+      final result = await joshAsync(() async {
         await Future.delayed(Duration(milliseconds: 1));
         throw Exception('Test async error');
       });
@@ -53,7 +53,7 @@ void main() {
     });
 
     test('jsAsync() - successful async operation', () async {
-      final result = await jsAsync(() async {
+      final result = await joshAsync(() async {
         await Future.delayed(Duration(milliseconds: 1));
         return 'async success';
       });
@@ -63,7 +63,7 @@ void main() {
 
     test('jsVoid() - void operation with null return', () {
       expect(() {
-        jsVoid(() {
+        joshVoid(() {
           throw Exception('Test void error');
         });
       }, returnsNormally);
@@ -71,7 +71,7 @@ void main() {
 
     test('jsVoid() - void operation with throw return', () {
       expect(() {
-        jsVoid(
+        joshVoid(
           () => throw Exception('Test void error'),
           returnType: 'throw',
         );
@@ -80,14 +80,14 @@ void main() {
 
     test('jsVoid() - successful void operation', () {
       expect(() {
-        jsVoid(() {
+        joshVoid(() {
           // Do nothing
         });
       }, returnsNormally);
     });
 
-    test('js() - with context', () {
-      final result = js(
+    test('josh() - with context', () {
+      final result = josh(
         () => throw Exception('Test error with context'),
         context: 'TestContext',
       );

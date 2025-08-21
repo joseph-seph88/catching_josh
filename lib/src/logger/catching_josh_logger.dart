@@ -2,8 +2,8 @@ import 'dart:developer' as developer;
 import 'package:flutter/foundation.dart';
 
 /// Standard and efficient error logger for JS functions
-class CatchingJsLogger {
-  static const String _packageName = 'CatchingJS';
+class CatchingJoshLogger {
+  static const String _packageName = 'CatchingJosh';
 
   /// Log error with environment-aware logging
   static void logError(
@@ -104,14 +104,14 @@ class CatchingJsLogger {
     try {
       final lines = stackTrace.toString().split('\n');
 
-      // js() 함수 호출 다음에 오는 실제 에러 위치 찾기
+      // josh() 함수 호출 다음에 오는 실제 에러 위치 찾기
       for (int i = 0; i < lines.length - 1; i++) {
         final line = lines[i];
 
-        // js() 함수 호출 건너뛰기
-        if (line.contains('js(') ||
-            line.contains('jsAsync(') ||
-            line.contains('jsVoid(')) {
+        // josh() 함수 호출 건너뛰기
+        if (line.contains('josh(') ||
+            line.contains('joshAsync(') ||
+            line.contains('joshVoid(')) {
           continue;
         }
 

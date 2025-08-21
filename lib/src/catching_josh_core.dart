@@ -1,7 +1,7 @@
-import 'logger/catching_js_logger.dart';
+import 'logger/catching_josh_logger.dart';
 
 /// JS function for sync operations
-T? js<T>(
+T? josh<T>(
   T Function() function, {
   String returnType = 'null', // 'null', 'throw', 'rethrow', 'exception'
   String? context,
@@ -18,7 +18,7 @@ T? js<T>(
 }
 
 /// JS function for async operations
-Future<T?> jsAsync<T>(
+Future<T?> joshAsync<T>(
   Future<T> Function() function, {
   String returnType = 'null', // 'null', 'throw', 'rethrow', 'exception'
   String? context,
@@ -35,7 +35,7 @@ Future<T?> jsAsync<T>(
 }
 
 /// JS function for void operations
-void jsVoid(
+void joshVoid(
   void Function() function, {
   String returnType = 'null', // 'null', 'throw', 'rethrow', 'exception'
   String? context,
@@ -60,19 +60,19 @@ T? _handleError<T>(
 ) {
   switch (returnType) {
     case 'null':
-      CatchingJsLogger.logError(error, stackTrace, context: context);
+      CatchingJoshLogger.logError(error, stackTrace, context: context);
       return null;
 
     case 'throw':
-      CatchingJsLogger.logError(error, stackTrace, context: context);
+      CatchingJoshLogger.logError(error, stackTrace, context: context);
       throw error;
 
     case 'exception':
-      CatchingJsLogger.logError(error, stackTrace, context: context);
+      CatchingJoshLogger.logError(error, stackTrace, context: context);
       throw Exception('JS Error: $error');
 
     default:
-      CatchingJsLogger.logError(error, stackTrace, context: context);
+      CatchingJoshLogger.logError(error, stackTrace, context: context);
       return null;
   }
 }
@@ -86,19 +86,19 @@ void _handleErrorForVoid(
 ) {
   switch (returnType) {
     case 'null':
-      CatchingJsLogger.logError(error, stackTrace, context: context);
+      CatchingJoshLogger.logError(error, stackTrace, context: context);
       break;
 
     case 'throw':
-      CatchingJsLogger.logError(error, stackTrace, context: context);
+      CatchingJoshLogger.logError(error, stackTrace, context: context);
       throw error;
 
     case 'exception':
-      CatchingJsLogger.logError(error, stackTrace, context: context);
+      CatchingJoshLogger.logError(error, stackTrace, context: context);
       throw Exception('[JS Error]:: $error');
 
     default:
-      CatchingJsLogger.logError(error, stackTrace, context: context);
+      CatchingJoshLogger.logError(error, stackTrace, context: context);
       break;
   }
 }
