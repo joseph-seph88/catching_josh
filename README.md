@@ -42,15 +42,15 @@ final data = josh(() => complexCalculation());
 ### 2. Asynchronous Operations
 ```dart
 // Handle async operations with error logging
-final posts = await jsAsync(() async => await api.getPosts());
-final user = await jsAsync(() async => await api.getUser(id));
+final posts = await joshAsync(() async => await api.getPosts());
+final user = await joshAsync(() async => await api.getUser(id));
 ```
 
 ### 3. Void Operations
 ```dart
 // Handle void operations with error logging
-jsVoid(() => storage.saveData('key', 'value'));
-jsVoid(() => cache.clear());
+joshVoid(() => storage.saveData('key', 'value'));
+joshVoid(() => cache.clear());
 ```
 
 ### 4. Error Handling Options
@@ -70,7 +70,7 @@ final result = josh(
   context: 'User authentication process',
 );
 
-final data = await jsAsync(
+final data = await joshAsync(
   () async => await api.getData(),
   context: 'Fetching user posts',
 );
@@ -93,7 +93,7 @@ final data3 = josh(() => riskyOperation(), returnType: 'rethrow');
 ### Real-world Scenarios
 ```dart
 // API calls with error handling
-final user = await jsAsync(
+final user = await joshAsync(
   () async => await api.getUser(id),
   context: 'Fetching user data',
 );
@@ -105,7 +105,7 @@ final data = josh(
 );
 
 // Local storage operations
-jsVoid(
+joshVoid(
   () => storage.saveData('user_pref', userData),
   context: 'Saving user preferences',
 );

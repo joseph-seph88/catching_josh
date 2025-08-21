@@ -29,7 +29,24 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 - Comprehensive unit tests covering all scenarios
 - MIT License
 
-## [1.0.0] - Planned Release
+## [1.0.0] - 2024-08-22
+
+### Released
+- Initial release of CatchingJosh package
+- Core error handling functions: `josh()`, `joshAsync()`, `joshVoid()`
+- Flexible error handling with multiple return types (null, throw, rethrow, exception)
+- Context-aware error logging system
+- Comprehensive test coverage for all core functions
+- Logger system for error tracking and debugging
+
+### Core Features
+- **`josh<T>()`** - Synchronous error handling with customizable return behavior
+- **`joshAsync<T>()`** - Asynchronous error handling for Future operations
+- **`joshVoid()`** - Void function error handling
+- **Error return types**: null, throw, rethrow, exception
+- **Context support** for better error tracking and debugging
+
+## [Unreleased]
 
 ### Planned Enhancements
 - Enhanced error logging and reporting
