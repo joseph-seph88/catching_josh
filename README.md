@@ -25,69 +25,86 @@ dependencies:
 import 'package:catching_josh/catching_josh.dart';
 
 // Basic usage examples
-final result = josh(() => riskyOperation());
-final data = await joshAsync(() async => await api.getData());
-joshVoid(() => storage.save(key, value));
+final response = joshSync(() => riskyOperation());
+final response = await joshAsync(() async => await api.getData());
+final response = await joshReq(() async => await http.get(url));
 ```
 
 ## Usage Guide
 
-### 1. Synchronous Operations
+### 1. Synchronous Operations (`joshSync`)
 ```dart
 // Handle sync operations with error logging
-final user = josh(() => parseUser(jsonString));
-final data = josh(() => complexCalculation());
+final user = joshSync(() => parseUser(jsonString));
+final data = joshSync(() => complexCalculation());
+final result = joshSync(
+  () => riskyOperation(),
+  messageTitle: 'User parsing',
+  errorMessage: 'Failed to parse user data',
+);
 ```
 
-### 2. Asynchronous Operations
+### 2. Asynchronous Operations (`joshAsync`)
 ```dart
 // Handle async operations with error logging
 final posts = await joshAsync(() async => await api.getPosts());
-final user = await joshAsync(() async => await api.getUser(id));
+final user = await joshAsync(
+  () async => await api.getUser(id),
+  messageTitle: 'Fetch user data',
+  errorHandleType: ErrorHandleType.returnNull,
+);
 ```
 
-### 3. Void Operations
+### 3. HTTP/Network Requests (`joshReq`)
 ```dart
-// Handle void operations with error logging
-joshVoid(() => storage.saveData('key', 'value'));
-joshVoid(() => cache.clear());
+// Handle HTTP requests with automatic response validation
+final response = await joshReq(() async => await http.get(url));
+final dioResponse = await joshReq(
+  () async => await dio.get(url),
+  messageTitle: 'API call',
+  errorHandleType: ErrorHandleType.rethrowError,
+);
 ```
 
 ### 4. Error Handling Options
 
 | Option | Description | Behavior |
 |--------|-------------|----------|
-| `'null'` (default) | Log error and return null | Safe fallback |
-| `'throw'` | Log error and throw original error | Re-throw for handling |
-| `'rethrow'` | Log error and rethrow (preserves stack) | Better debugging |
-| `'exception'` | Log error and throw new Exception | Custom error type |
+| `ErrorHandleType.returnNull` | Log error and return null | Safe fallback |
+| `ErrorHandleType.throwError` | Log error and throw JoshException | Custom error handling |
+| `ErrorHandleType.rethrowError` | Log error and rethrow original | Preserves original stack trace |
 
-### 5. With Context
-```dart
-// Add context for better debugging
-final result = josh(
-  () => complexOperation(),
-  context: 'User authentication process',
-);
+### 5. Logging Features
 
-final data = await joshAsync(
-  () async => await api.getData(),
-  context: 'Fetching user posts',
-);
-```
+#### Success Logging
+- Automatic success response logging
+- HTTP response status code and data type detection
+- Customizable success message titles
+
+#### Error Logging
+- Beautiful box-formatted error logs
+- Stack trace extraction and formatting
+- Custom error messages and titles
+- File and line number information
 
 ## Examples
 
 ### Basic Error Handling
 ```dart
-// Default behavior: log error and return null
-final data1 = josh(() => riskyOperation());
+// Default behavior: log error and throw JoshException
+final data1 = joshSync(() => riskyOperation());
 
-// Log error and throw
-final data2 = josh(() => riskyOperation(), returnType: 'throw');
+// Log error and return null
+final data2 = joshAsync(
+  () async => await api.getData(),
+  errorHandleType: ErrorHandleType.returnNull,
+);
 
 // Log error and rethrow (preserves stack trace)
-final data3 = josh(() => riskyOperation(), returnType: 'rethrow');
+final data3 = await joshReq(
+  () async => await http.get(url),
+  errorHandleType: ErrorHandleType.rethrowError,
+);
 ```
 
 ### Real-world Scenarios
@@ -95,21 +112,78 @@ final data3 = josh(() => riskyOperation(), returnType: 'rethrow');
 // API calls with error handling
 final user = await joshAsync(
   () async => await api.getUser(id),
-  context: 'Fetching user data',
+  messageTitle: 'Fetching user data',
+  errorHandleType: ErrorHandleType.returnNull,
 );
 
 // JSON parsing with error handling
-final data = josh(
+final data = joshSync(
   () => jsonDecode(jsonString),
-  context: 'Parsing API response',
+  messageTitle: 'Parsing API response',
+  errorMessage: 'Invalid JSON format',
 );
 
-// Local storage operations
-joshVoid(
-  () => storage.saveData('user_pref', userData),
-  context: 'Saving user preferences',
+// HTTP requests with validation
+final response = await joshReq(
+  () async => await http.get(Uri.parse(url)),
+  messageTitle: 'Fetching posts',
+  showSuccessLog: true,
+  showErrorLog: true,
 );
 ```
+
+### Custom Error Messages
+```dart
+final result = joshSync(
+  () => complexOperation(),
+  messageTitle: 'Data processing',
+  errorMessage: 'Failed to process user data. Please try again.',
+);
+```
+
+## API Reference
+
+### Core Functions
+
+| Function | Purpose | Return Type | Best For |
+|----------|---------|-------------|----------|
+| `joshSync<T>()` | Sync operations | `T?` | Data parsing, calculations |
+| `joshAsync<T>()` | Async operations | `Future<T?>` | API calls, file operations |
+| `joshReq<T>()` | HTTP requests | `Future<T>` | Network calls, external APIs |
+
+### Parameters
+
+| Parameter | Type | Required | Description |
+|-----------|------|----------|-------------|
+| `function` | `Function` | ✅ | The function to execute |
+| `errorHandleType` | `ErrorHandleType` | ❌ | Error handling strategy |
+| `messageTitle` | `String?` | ❌ | Title for logging messages |
+| `errorMessage` | `String?` | ❌ | Custom error message |
+| `showSuccessLog` | `bool` | ❌ | Whether to log success (default: true) |
+| `showErrorLog` | `bool` | ❌ | Whether to log errors (default: true) |
+
+### ErrorHandleType Enum
+
+```dart
+enum ErrorHandleType {
+  returnNull('null'),      // Return null on error
+  rethrowError('rethrow'), // Rethrow original error
+  throwError('throw'),     // Throw JoshException
+}
+```
+
+## Example App
+
+Check out the comprehensive example in the `/example` folder to see all features in action with an interactive Flutter app.
+
+## Features
+
+- **Elegant Error Handling**: Beautiful, formatted error logs
+- **Flexible Error Strategies**: Multiple error handling options
+- **Automatic Response Validation**: HTTP response status checking
+- **Customizable Logging**: Control what gets logged
+- **Type Safety**: Full Dart type safety support
+- **Zero Dependencies**: No external package dependencies
 
 ## License
 
