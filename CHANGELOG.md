@@ -7,50 +7,32 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 
 ## [Unreleased]
 
-### Added
-- Initial package structure for CatchingJosh
-- Core error handling functions: `josh()`, `joshAsync()`, `joshVoid()`
-- Flexible error handling with multiple return types (null, throw, rethrow, exception)
-- Context-aware error logging system
-- Comprehensive test coverage for all core functions
-- Logger system for error tracking and debugging
-
-### Core Features
-- **`josh<T>()`** - Synchronous error handling with customizable return behavior
-- **`joshAsync<T>()`** - Asynchronous error handling for Future operations
-- **`joshVoid()`** - Void function error handling
-- **Error return types**: null, throw, rethrow, exception
-- **Context support** for better error tracking and debugging
-
-### Technical Implementation
-- Dart/Flutter package structure
-- Error handling utilities for try-catch operations
-- Logger integration for error reporting
-- Comprehensive unit tests covering all scenarios
-- MIT License
-
-## [1.0.0+1] - 2024-08-22
-
-### Released
-- Initial release of CatchingJosh package
-- Core error handling functions: `josh()`, `joshAsync()`, `joshVoid()`
-- Flexible error handling with multiple return types (null, throw, rethrow, exception)
-- Context-aware error logging system
-- Comprehensive test coverage for all core functions
-- Logger system for error tracking and debugging
-
-### Core Features
-- **`josh<T>()`** - Synchronous error handling with customizable return behavior
-- **`joshAsync<T>()`** - Asynchronous error handling for Future operations
-- **`joshVoid()`** - Void function error handling
-- **Error return types**: null, throw, rethrow, exception
-- **Context support** for better error tracking and debugging
-
-## [Unreleased]
-
-### Planned Enhancements
-- Enhanced error logging and reporting
+### Planned
 - Performance optimizations
 - Additional utility functions
 - Extended documentation and examples
-- Community feedback integration
+
+## [1.0.0+1] - 2025-08-25
+
+### Added
+- Initial release of CatchingJosh package
+- Core error handling functions: `joshSync()`, `joshAsync()`, `joshReq()`
+- Flexible error handling with `ErrorHandleType` enum
+- Beautiful formatted error logging system
+- HTTP response validation for network requests
+- Comprehensive test coverage for all core functions
+
+### Core Features
+- **`joshSync<T>()`** - Synchronous error handling with logging
+- **`joshAsync<T>()`** - Asynchronous error handling for Future operations
+- **`joshReq<T>()** - HTTP/network request handling with response validation
+- **Error handling types**: returnNull, rethrowError, throwError
+- **Customizable logging**: success/error log control
+- **Message titles and custom error messages**
+
+### Technical Details
+- Dart/Flutter package with zero external dependencies
+- Beautiful box-formatted logging output
+- Stack trace extraction and formatting
+- HTTP response status validation
+- MIT License
