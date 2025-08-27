@@ -7,6 +7,13 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 
 ## [Unreleased]
 
+### Planned
+- Performance optimizations
+- Additional utility functions
+- Extended documentation and examples
+
+## [1.1.0] - 2025-08-28
+
 ### Added
 - **Enhanced Logging System**: Improved ResponseExtractor with debug-mode only logging using `developer.log`
 - **Configurable Cache Management**: Environment variable-based cache size configuration (`JOSH_LOGGER_MAX_CACHE_SIZE`)
@@ -25,11 +32,6 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 - **Memory Usage Accuracy**: Proper UTF-8 byte calculation instead of character count assumptions
 - **Runtime Cache Management**: `setMaxCacheSize()` method for dynamic cache size adjustment
 - **Performance Monitoring**: `cacheStats` getter for comprehensive cache performance insights
-
-### Planned
-- Performance optimizations
-- Additional utility functions
-- Extended documentation and examples
 
 ## [1.0.0+1] - 2025-08-25
 
