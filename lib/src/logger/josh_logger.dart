@@ -1,14 +1,19 @@
 import 'dart:developer' as developer;
-
 import 'package:catching_josh/src/logger/utils/error_extractor.dart';
 import 'package:catching_josh/src/logger/utils/response_extractor.dart';
 import 'package:catching_josh/src/logger/utils/response_validator.dart';
 import 'package:catching_josh/src/logger/utils/log_formatter.dart';
 
 /// Main logging class for CatchingJosh package
-/// Provides comprehensive logging capabilities with beautiful formatting
+/// Provides comprehensive logging capabilities with clean formatting
 /// for both error and success scenarios
 class JoshLogger {
+  static bool get _isProduction {
+    const environment =
+        String.fromEnvironment('ENVIRONMENT', defaultValue: 'dev');
+    return environment == 'prod' || environment == 'production';
+  }
+
   /// Logs error information with detailed formatting
   ///
   /// [error] - The error object to log
@@ -55,7 +60,12 @@ class JoshLogger {
     String? successTitle,
     String? successMessage,
   }) {
-    developer.log(LogFormatter.createTopLine('$successTitle Success Summary'));
+    if (_isProduction) return;
+
+    developer.log(
+      LogFormatter.createTopLine('$successTitle Success Summary'),
+      level: 800,
+    );
 
     if (response != null) {
       if (ResponseValidator.isHttpResponse(response)) {
@@ -66,24 +76,32 @@ class JoshLogger {
 
         if (successMessage != null) {
           developer.log(
-              LogFormatter.createContentLine('SuccessMessage', successMessage));
+              LogFormatter.createContentLine('SuccessMessage', successMessage),
+              level: 800);
         }
 
-        developer.log(LogFormatter.createContentLine(
-            'StatusCode', responseData.statusCode));
-        developer
-            .log(LogFormatter.createContentLine('DataType', responseDataType));
-        developer.log(LogFormatter.createContentLine('Data', responseResult));
+        developer.log(
+            LogFormatter.createContentLine(
+                'StatusCode', responseData.statusCode),
+            level: 800);
+        developer.log(
+            LogFormatter.createContentLine('DataType', responseDataType),
+            level: 800);
+        developer.log(LogFormatter.createContentLine('Data', responseResult),
+            level: 800);
       } else {
         developer.log(
-            LogFormatter.createContentLine('DataType', response.runtimeType));
-        developer.log(LogFormatter.createContentLine('Data', response));
+            LogFormatter.createContentLine('DataType', response.runtimeType),
+            level: 800);
+        developer.log(LogFormatter.createContentLine('Data', response),
+            level: 800);
       }
     } else {
-      developer.log(LogFormatter.createContentLine('Data', response));
+      developer.log(LogFormatter.createContentLine('Data', response),
+          level: 800);
     }
 
-    developer.log(LogFormatter.createBottomLine());
+    developer.log(LogFormatter.createBottomLine(), level: 800);
   }
 }
 
