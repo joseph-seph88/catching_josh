@@ -1,13 +1,34 @@
+import 'dart:developer' as developer;
+
 /// Utility class for extracting data from different types of HTTP responses
 /// Supports multiple response types including http, dio, and custom response objects
 /// Provides unified interface for accessing status codes, response data, and data types
 class ResponseExtractor {
+  /// Logs extraction errors for debugging purposes
+  /// Only logs in debug mode to avoid production noise
+  static void _extractDebugLog(String message) {
+    assert(() {
+      developer.log(
+        message,
+        level: 800,
+        name: 'ResponseExtractor',
+      );
+      return true;
+    }());
+  }
+
   /// Extracts status code from HTTP response objects
   ///
   /// [response] - The response object (http.Response, dio.Response, etc.)
   /// Returns the status code if available, null otherwise
   static int? getStatusCode(dynamic response) {
-    return response.statusCode;
+    try {
+      return response.statusCode;
+    } catch (e) {
+      _extractDebugLog(
+          'ResponseExtractor: statusCode extraction failed - ${response.runtimeType}');
+      return null;
+    }
   }
 
   /// Extracts response data from different types of HTTP responses
@@ -26,7 +47,8 @@ class ResponseExtractor {
         return body;
       }
     } catch (e) {
-      // Not Http Response
+      _extractDebugLog(
+          'ResponseExtractor: response.body extraction failed - ${response.runtimeType}');
     }
 
     try {
@@ -35,14 +57,18 @@ class ResponseExtractor {
         return data;
       }
     } catch (e) {
-      // Not Dio Response
+      _extractDebugLog(
+          'ResponseExtractor: response.data extraction failed - ${response.runtimeType}');
     }
 
     try {
       return response.content;
     } catch (e) {
-      return null;
+      _extractDebugLog(
+          'ResponseExtractor: response.content extraction failed - ${response.runtimeType}');
     }
+
+    return null;
   }
 
   /// Extracts the runtime type of response data
@@ -58,19 +84,24 @@ class ResponseExtractor {
     try {
       return response.body.runtimeType;
     } catch (e) {
-      // Not Http Response
+      _extractDebugLog(
+          'ResponseExtractor: response.body.runtimeType extraction failed - ${response.runtimeType}');
     }
 
     try {
       return response.data.runtimeType;
     } catch (e) {
-      // Not Dio Response
+      _extractDebugLog(
+          'ResponseExtractor: response.data.runtimeType extraction failed - ${response.runtimeType}');
     }
 
     try {
       return response.content.runtimeType;
     } catch (e) {
-      return null;
+      _extractDebugLog(
+          'ResponseExtractor: response.content.runtimeType extraction failed - ${response.runtimeType}');
     }
+
+    return null;
   }
 }

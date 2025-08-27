@@ -7,6 +7,25 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 
 ## [Unreleased]
 
+### Added
+- **Enhanced Logging System**: Improved ResponseExtractor with debug-mode only logging using `developer.log`
+- **Configurable Cache Management**: Environment variable-based cache size configuration (`JOSH_LOGGER_MAX_CACHE_SIZE`)
+- **Accurate Memory Usage Calculation**: UTF-8 encoding based memory usage calculation for better monitoring
+- **Dynamic Cache Size Adjustment**: Runtime cache size adjustment capabilities
+- **Cache Statistics Monitoring**: Comprehensive cache statistics and performance monitoring
+
+### Improved
+- **ResponseExtractor Error Handling**: Better error logging with consistent message format and English localization
+- **LogFormatter Performance**: Enhanced caching system with configurable limits and memory optimization
+- **Debug Mode Logging**: Production-safe logging using `assert()` blocks for development-only output
+- **Code Maintainability**: Unified logging approach with `_extractDebugLog()` helper method
+
+### Technical Enhancements
+- **Environment Variable Support**: `JOSH_LOGGER_MAX_CACHE_SIZE` for flexible cache configuration
+- **Memory Usage Accuracy**: Proper UTF-8 byte calculation instead of character count assumptions
+- **Runtime Cache Management**: `setMaxCacheSize()` method for dynamic cache size adjustment
+- **Performance Monitoring**: `cacheStats` getter for comprehensive cache performance insights
+
 ### Planned
 - Performance optimizations
 - Additional utility functions
@@ -18,7 +37,7 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 - Initial release of CatchingJosh package
 - Core error handling functions: `joshSync()`, `joshAsync()`, `joshReq()`
 - Flexible error handling with `ErrorHandleType` enum
-- Beautiful formatted error logging system
+- clean formatted error logging system
 - HTTP response validation for network requests
 - Comprehensive test coverage for all core functions
 
@@ -32,7 +51,7 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 
 ### Technical Details
 - Dart/Flutter package with zero external dependencies
-- Beautiful box-formatted logging output
+- clean box-formatted logging output
 - Stack trace extraction and formatting
 - HTTP response status validation
 - MIT License

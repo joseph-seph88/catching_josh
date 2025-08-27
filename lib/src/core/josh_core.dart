@@ -21,8 +21,8 @@ T? joshSync<T>(
   ErrorHandleType errorHandleType = ErrorHandleType.throwError,
   String? messageTitle,
   String? errorMessage,
-  bool showSuccessLog = true,
-  bool showErrorLog = true,
+  bool showSuccessLog = false,
+  bool showErrorLog = false,
 }) {
   try {
     final response = function();
@@ -53,8 +53,8 @@ Future<T?> joshAsync<T>(
   ErrorHandleType errorHandleType = ErrorHandleType.throwError,
   String? messageTitle,
   String? errorMessage,
-  bool showSuccessLog = true,
-  bool showErrorLog = true,
+  bool showSuccessLog = false,
+  bool showErrorLog = false,
 }) async {
   try {
     final response = await function();
@@ -85,8 +85,8 @@ Future<T> joshReq<T>(
   ErrorHandleType errorHandleType = ErrorHandleType.throwError,
   String? messageTitle,
   String? errorMessage,
-  bool showSuccessLog = true,
-  bool showErrorLog = true,
+  bool showSuccessLog = false,
+  bool showErrorLog = false,
 }) async {
   try {
     final response = await function();
@@ -134,7 +134,7 @@ T? _handleError<T>(
   ErrorHandleType errorHandleType, {
   String? errorTitle,
   String? errorMessage,
-  bool showLog = true,
+  bool showLog = false,
 }) {
   if (showLog) {
     JoshLogger.logError(
@@ -159,7 +159,7 @@ T _requestHandleError<T>(
   StackTrace? stackTrace, {
   String? errorTitle,
   String? errorMessage,
-  bool showLog = true,
+  bool showLog = false,
 }) {
   if (showLog) {
     JoshLogger.logError(

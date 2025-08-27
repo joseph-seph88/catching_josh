@@ -82,7 +82,7 @@ final dioResponse = await joshReq(
 - Customizable success message titles
 
 #### Error Logging
-- Beautiful box-formatted error logs
+- Clean box-formatted error logs
 - Stack trace extraction and formatting
 - Custom error messages and titles
 - File and line number information
@@ -178,7 +178,7 @@ Check out the comprehensive example in the `/example` folder to see all features
 
 ## Features
 
-- **Elegant Error Handling**: Beautiful, formatted error logs
+- **Clean Error Handling**: Clean formatted error logs
 - **Flexible Error Strategies**: Multiple error handling options
 - **Automatic Response Validation**: HTTP response status checking
 - **Customizable Logging**: Control what gets logged

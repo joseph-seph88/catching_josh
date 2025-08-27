@@ -5,7 +5,7 @@
 /// - [joshAsync]: For asynchronous operations
 /// - [joshReq]: For HTTP/network requests
 ///
-/// Features include beautiful error logging, customizable error handling,
+/// Features include clean error logging, customizable error handling,
 /// and automatic response validation for network requests.
 library;
 
