@@ -1,7 +1,7 @@
 # catching_josh
 
 **Author:** Joseph88  
-**Version:** 1.0.0  
+**Version:** 1.1.0  
 **License:** MIT
 **Git** https://github.com/joseph-seph88/catching_josh
 
@@ -16,7 +16,7 @@
 
 ```yaml
 dependencies:
-  catching_josh: ^1.0.0
+  catching_josh: ^1.1.0
 ```
 
 ## Quick Start
@@ -74,18 +74,26 @@ final dioResponse = await joshReq(
 | `ErrorHandleType.throwError` | Log error and throw JoshException | Custom error handling |
 | `ErrorHandleType.rethrowError` | Log error and rethrow original | Preserves original stack trace |
 
-### 5. Logging Features
+### 5. Enhanced Logging Features
 
 #### Success Logging
 - Automatic success response logging
 - HTTP response status code and data type detection
 - Customizable success message titles
+- Production-safe logging (success logs disabled in production)
 
 #### Error Logging
-- Clean box-formatted error logs
+- Clean box-formatted error logs using `developer.log`
 - Stack trace extraction and formatting
 - Custom error messages and titles
 - File and line number information
+- Debug-mode only logging for production safety
+
+#### Advanced Logging Capabilities
+- **Environment Variable Configuration**: Set cache size via `JOSH_LOGGER_MAX_CACHE_SIZE`
+- **Accurate Memory Monitoring**: UTF-8 encoding based memory usage calculation
+- **Dynamic Cache Management**: Runtime cache size adjustment
+- **Performance Statistics**: Comprehensive cache performance insights
 
 ## Examples
 
@@ -141,6 +149,24 @@ final result = joshSync(
 );
 ```
 
+### Advanced Logging Configuration
+```bash
+# Set custom cache size via environment variable
+flutter run --dart-define=JOSH_LOGGER_MAX_CACHE_SIZE=2000
+
+# Runtime cache size adjustment
+import 'package:catching_josh/src/logger/utils/log_formatter.dart';
+
+// Adjust cache size based on memory pressure
+if (memoryPressure > 80) {
+  LogFormatter.setMaxCacheSize(100);
+}
+
+// Monitor cache performance
+final stats = LogFormatter.cacheStats;
+print('Cache usage: ${stats['memoryUsageKB']}KB');
+```
+
 ## API Reference
 
 ### Core Functions
@@ -178,12 +204,23 @@ Check out the comprehensive example in the `/example` folder to see all features
 
 ## Features
 
-- **Clean Error Handling**: Clean formatted error logs
+- **Clean Error Handling**: Clean formatted error logs using `developer.log`
 - **Flexible Error Strategies**: Multiple error handling options
 - **Automatic Response Validation**: HTTP response status checking
 - **Customizable Logging**: Control what gets logged
 - **Type Safety**: Full Dart type safety support
 - **Zero Dependencies**: No external package dependencies
+- **Enhanced Logging System**: Debug-mode only logging with production safety
+- **Configurable Cache Management**: Environment variable based cache size configuration
+- **Accurate Memory Monitoring**: UTF-8 encoding based memory usage calculation
+- **Dynamic Performance Optimization**: Runtime cache size adjustment capabilities
+- **Performance Insights**: Comprehensive cache statistics and monitoring
+
+## Environment Variables
+
+| Variable | Description | Default | Usage |
+|----------|-------------|---------|-------|
+| `JOSH_LOGGER_MAX_CACHE_SIZE` | Maximum cache size for log formatting | 1000 | `flutter run --dart-define=JOSH_LOGGER_MAX_CACHE_SIZE=2000` |
 
 ## License
 
