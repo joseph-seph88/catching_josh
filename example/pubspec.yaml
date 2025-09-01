@@ -1,6 +1,6 @@
 name: catching_josh_example
 description: "Example app demonstrating how to use the catching_josh package."
-version: 1.0.0+1
+version: 1.2.0
 publish_to: 'none'
 
 environment:

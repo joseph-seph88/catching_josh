@@ -8,23 +8,29 @@ class ErrorExtractor {
   /// Extracts file name and line number from a stack trace
   ///
   /// [stackTrace] - The stack trace to extract information from
-  /// Returns formatted string like 'main.dart:25' or full stack trace if extraction fails
-  static String extractFileAndLine(StackTrace stackTrace) {
+  /// Returns a list of formatted strings like 'main.dart:25' or full stack trace if extraction fails
+  /// Only includes files from 'lib/' or 'test/' directories for better readability
+  static List<String> extractFileAndLines(StackTrace stackTrace) {
+    final results = <String>[];
+
     try {
       final lines = stackTrace.toString().split('\n');
 
       for (final line in lines.take(5)) {
         final match = _fileLineRegex.firstMatch(line);
         if (match != null) {
-          final fileName = match.group(1)?.split('/').last ?? 'unknown';
+          final filePath = match.group(1) ?? '';
           final lineNumber = match.group(2) ?? '?';
-          return '$fileName:$lineNumber';
+
+          if (filePath.contains('lib/') || filePath.contains('test/')) {
+            final fileName = filePath.split('/').last;
+            results.add('$fileName:$lineNumber');
+          }
         }
       }
+      return results;
     } catch (e) {
-      return stackTrace.toString();
+      return [stackTrace.toString()];
     }
-
-    return stackTrace.toString();
   }
 }

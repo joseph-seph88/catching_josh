@@ -8,7 +8,7 @@ class LogFormatter {
   );
 
   static const int _boxWidth = 80;
-  
+
   static final Map<String, String> _cachedTopLines = {};
   static final Map<String, String> _cachedContentLines = {};
   static final String _cachedBottomLine = _createBottomLine();

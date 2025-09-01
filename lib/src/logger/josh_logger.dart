@@ -1,7 +1,5 @@
 import 'dart:developer' as developer;
 import 'package:catching_josh/src/logger/utils/error_extractor.dart';
-import 'package:catching_josh/src/logger/utils/response_extractor.dart';
-import 'package:catching_josh/src/logger/utils/response_validator.dart';
 import 'package:catching_josh/src/logger/utils/log_formatter.dart';
 
 /// Main logging class for CatchingJosh package
@@ -14,15 +12,15 @@ class JoshLogger {
     return environment == 'prod' || environment == 'production';
   }
 
-  /// Logs error information with detailed formatting
+  /// Logs error information for async/sync operations with detailed formatting
   ///
   /// [error] - The error object to log
   /// [stackTrace] - Optional stack trace for debugging
   /// [errorTitle] - Optional title for the error log
   /// [errorMessage] - Optional custom error message
-  static void logError(
-    Object error,
-    StackTrace? stackTrace, {
+  static void logResultError({
+    Object? error,
+    StackTrace? stackTrace,
     String? errorTitle,
     String? errorMessage,
   }) {
@@ -37,12 +35,16 @@ class JoshLogger {
           level: 1000);
     }
 
-    developer.log(LogFormatter.createContentLine('Error', error), level: 1000);
+    if (error != null) {
+      developer.log(LogFormatter.createContentLine('Error', error),
+          level: 1000);
+    }
 
     if (stackTrace != null) {
-      final st = ErrorExtractor.extractFileAndLine(stackTrace);
+      final st = ErrorExtractor.extractFileAndLines(stackTrace);
       if (st.isNotEmpty) {
-        developer.log(LogFormatter.createContentLine('StackTrace', st),
+        developer.log(
+            LogFormatter.createContentLine('StackTrace', st.join(' → ')),
             level: 1000);
       }
     }
@@ -50,13 +52,13 @@ class JoshLogger {
     developer.log(LogFormatter.createBottomLine(), level: 1000);
   }
 
-  /// Logs success information with detailed formatting
+  /// Logs success information for async/sync operations with detailed formatting
   ///
-  /// [response] - The response object to log
+  /// [result] - The result object to log
   /// [successTitle] - Optional title for the success log
   /// [successMessage] - Optional custom success message
-  static void logSuccess({
-    Object? response,
+  static void logResultSuccess({
+    Object? result,
     String? successTitle,
     String? successMessage,
   }) {
@@ -67,37 +69,140 @@ class JoshLogger {
       level: 800,
     );
 
-    if (response != null) {
-      if (ResponseValidator.isHttpResponse(response)) {
-        final responseData = response as dynamic;
-        final responseDataType =
-            ResponseExtractor.getResponseDataType(responseData);
-        final responseResult = ResponseExtractor.getResponseData(responseData);
+    if (successMessage != null) {
+      developer.log(
+          LogFormatter.createContentLine('SuccessMessage', successMessage),
+          level: 800);
+    }
 
-        if (successMessage != null) {
-          developer.log(
-              LogFormatter.createContentLine('SuccessMessage', successMessage),
-              level: 800);
-        }
+    if (result != null) {
+      developer.log(LogFormatter.createContentLine('ResultData', result),
+          level: 800);
+    }
 
+    developer.log(
+        LogFormatter.createContentLine(
+            'ResultDataType', result.runtimeType.toString()),
+        level: 800);
+
+    developer.log(LogFormatter.createBottomLine(), level: 800);
+  }
+
+  /// Logs error information for HTTP responses with detailed formatting
+  ///
+  /// [errorMessage] - Optional custom error message
+  /// [statusCode] - Optional HTTP status code
+  /// [responseData] - Optional response data
+  /// [requestUri] - Optional request URI
+  /// [responseUri] - Optional response URI
+  /// [error] - Optional error object
+  /// [stackTrace] - Optional stack trace for debugging
+  static void logResponseError({
+    String? errorMessage,
+    int? statusCode,
+    dynamic responseData,
+    String? requestUri,
+    String? responseUri,
+    Object? error,
+    StackTrace? stackTrace,
+  }) {
+    developer.log(
+      LogFormatter.createTopLine('Response Error Summary'),
+      level: 1000,
+    );
+
+    if (error != null) {
+      developer.log(LogFormatter.createContentLine('Error', error),
+          level: 1000);
+    }
+
+    if (stackTrace != null) {
+      final st = ErrorExtractor.extractFileAndLines(stackTrace);
+      if (st.isNotEmpty) {
         developer.log(
-            LogFormatter.createContentLine(
-                'StatusCode', responseData.statusCode),
-            level: 800);
-        developer.log(
-            LogFormatter.createContentLine('DataType', responseDataType),
-            level: 800);
-        developer.log(LogFormatter.createContentLine('Data', responseResult),
-            level: 800);
-      } else {
-        developer.log(
-            LogFormatter.createContentLine('DataType', response.runtimeType),
-            level: 800);
-        developer.log(LogFormatter.createContentLine('Data', response),
-            level: 800);
+            LogFormatter.createContentLine('StackTrace', st.join(' → ')),
+            level: 1000);
       }
+    }
+
+    if (errorMessage != null) {
+      developer.log(
+          LogFormatter.createContentLine('ErrorMessage', errorMessage),
+          level: 1000);
+    }
+
+    if (statusCode != null) {
+      developer.log(LogFormatter.createContentLine('StatusCode', statusCode),
+          level: 1000);
+    }
+
+    if (requestUri != null) {
+      developer.log(LogFormatter.createContentLine('RequestUri', requestUri),
+          level: 1000);
+    }
+
+    if (responseUri != null) {
+      developer.log(LogFormatter.createContentLine('ResponseUri', responseUri),
+          level: 1000);
+    }
+
+    if (responseData != null) {
+      developer.log(
+          LogFormatter.createContentLine('ResponseData', responseData),
+          level: 1000);
+    }
+
+    developer.log(LogFormatter.createBottomLine(), level: 1000);
+  }
+
+  /// Logs success information for HTTP responses with detailed formatting
+  ///
+  /// [successMessage] - Optional custom success message
+  /// [statusCode] - Optional HTTP status code
+  /// [responseData] - Optional response data
+  /// [requestUri] - Optional request URI
+  /// [responseUri] - Optional response URI
+  static void logResponseSuccess({
+    String? successMessage,
+    int? statusCode,
+    dynamic responseData,
+    String? requestUri,
+    String? responseUri,
+  }) {
+    if (_isProduction) return;
+
+    developer.log(
+      LogFormatter.createTopLine('Response Success Summary'),
+      level: 800,
+    );
+
+    if (successMessage != null) {
+      developer.log(
+          LogFormatter.createContentLine('successMessage', successMessage),
+          level: 800);
+    }
+
+    if (statusCode != null) {
+      developer.log(LogFormatter.createContentLine('StatusCode', statusCode),
+          level: 800);
+    }
+
+    if (requestUri != null) {
+      developer.log(LogFormatter.createContentLine('RequestUri', requestUri),
+          level: 800);
+    }
+
+    if (responseUri != null) {
+      developer.log(LogFormatter.createContentLine('ResponseUri', responseUri),
+          level: 800);
+    }
+
+    if (responseData != null) {
+      developer.log(
+          LogFormatter.createContentLine('ResponseData', responseData),
+          level: 800);
     } else {
-      developer.log(LogFormatter.createContentLine('Data', response),
+      developer.log(LogFormatter.createContentLine('ResponseData', 'Null'),
           level: 800);
     }
 

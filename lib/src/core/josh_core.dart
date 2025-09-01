@@ -1,174 +1,98 @@
-import 'package:catching_josh/src/core/error_handle_type.dart';
-import 'package:catching_josh/src/logger/exceptions/josh_exception.dart';
+import 'package:catching_josh/src/handlers/result_handler.dart';
+import 'package:catching_josh/src/handlers/response_handler.dart';
+import 'package:catching_josh/src/models/standard_response.dart';
+import 'package:catching_josh/src/models/standard_result.dart';
 import 'package:catching_josh/src/logger/josh_logger.dart';
-import 'package:catching_josh/src/logger/utils/response_validator.dart';
 
 /// Core Functions for CatchingJosh package
-/// [joshSync] : Local data access, file operations, database operations, and other sync tasks
-/// [joshAsync] : Asynchronous operations like API calls, file I/O, database operations
-/// [joshReq] : HTTP requests, network calls, and external API calls with response validation
-
-/// Parameters for all functions:
+///
+/// [joshSync] : Synchronous operations (file I/O, database operations)
+/// [joshAsync] : Asynchronous operations (file I/O, database operations, service calls)
+/// [joshReq] : HTTP API calls with standardized response handling
+///
+/// Function Parameters:
 /// [function] : (Required) The function to execute
-/// [errorHandleType] : (Optional) Error handling strategy (null, throw, rethrow)
-/// [messageTitle] : (Optional) Custom title for logging messages
+/// [logTitle] : (Optional) Custom title for logging messages
 /// [errorMessage] : (Optional) Custom error message
-/// [showSuccessLog] : (Optional) Whether to log success (default: true)
-/// [showErrorLog] : (Optional) Whether to log errors (default: true)
+/// [showSuccessLog] : (Optional) Whether to log success (default: false)
+/// [showErrorLog] : (Optional) Whether to log errors (default: false)
+///
+/// Return Types:
+/// - joshSync: `StandardResult`
+/// - joshAsync: `Future<StandardResult>`
+/// - joshReq: `Future<StandardResponse>`
 
-T? joshSync<T>(
+StandardResult joshSync<T>(
   T Function() function, {
-  ErrorHandleType errorHandleType = ErrorHandleType.throwError,
-  String? messageTitle,
+  String? logTitle,
   String? errorMessage,
   bool showSuccessLog = false,
   bool showErrorLog = false,
 }) {
   try {
-    final response = function();
-
-    if (showSuccessLog) {
-      _handleSuccess<T>(response, messageTitle);
-    }
-
-    return response;
+    final result = function();
+    final standardResult = ResultHandler.syncHandleResult(
+      result: result,
+      logTitle: logTitle,
+      errorMessage: errorMessage,
+      showSuccessLog: showSuccessLog,
+      showErrorLog: showErrorLog,
+    );
+    return standardResult;
   } catch (error, stackTrace) {
-    if (errorHandleType == ErrorHandleType.rethrowError) {
-      rethrow;
-    } else {
-      return _handleError<T>(
-        error,
-        stackTrace,
-        errorHandleType,
-        errorTitle: messageTitle,
-        errorMessage: errorMessage,
-        showLog: showErrorLog,
-      );
-    }
+    JoshLogger.logResultError(
+      error: error,
+      stackTrace: stackTrace,
+      errorTitle: logTitle,
+      errorMessage: errorMessage,
+    );
+    return StandardResult(errorMessage: errorMessage);
   }
 }
 
-Future<T?> joshAsync<T>(
+Future<StandardResult> joshAsync<T>(
   Future<T> Function() function, {
-  ErrorHandleType errorHandleType = ErrorHandleType.throwError,
-  String? messageTitle,
+  String? logTitle,
   String? errorMessage,
   bool showSuccessLog = false,
   bool showErrorLog = false,
 }) async {
   try {
-    final response = await function();
+    final result = await function();
 
-    if (showSuccessLog) {
-      _handleSuccess<T>(response, messageTitle);
-    }
+    final standardResult = ResultHandler.asyncHandleResult(
+      result: result,
+      logTitle: logTitle,
+      errorMessage: errorMessage,
+      showSuccessLog: showSuccessLog,
+      showErrorLog: showErrorLog,
+    );
 
-    return response;
+    return standardResult;
   } catch (error, stackTrace) {
-    if (errorHandleType == ErrorHandleType.rethrowError) {
-      rethrow;
-    } else {
-      return _handleError<T>(
-        error,
-        stackTrace,
-        errorHandleType,
-        errorTitle: messageTitle,
-        errorMessage: errorMessage,
-        showLog: showErrorLog,
-      );
-    }
+    JoshLogger.logResultError(
+      error: error,
+      stackTrace: stackTrace,
+      errorTitle: logTitle,
+      errorMessage: errorMessage,
+    );
+    return StandardResult(errorMessage: errorMessage);
   }
 }
 
-Future<T> joshReq<T>(
-  Future<T> Function() function, {
-  ErrorHandleType errorHandleType = ErrorHandleType.throwError,
-  String? messageTitle,
-  String? errorMessage,
-  bool showSuccessLog = false,
-  bool showErrorLog = false,
-}) async {
+Future<StandardResponse> joshReq(
+  Future<dynamic> Function() function,
+) async {
   try {
     final response = await function();
-
-    if (response == null) {
-      throw JoshException(
-        Exception('Response is Null'),
-        errorTitle: messageTitle,
-      );
-    }
-
-    ResponseValidator.validateHttpStatus(response);
-
-    if (showSuccessLog) {
-      _handleSuccess<T>(response, messageTitle);
-    }
-
-    return response;
+    final standardResponse = ResponseHandler.handleResponse(response);
+    return standardResponse;
   } catch (error, stackTrace) {
-    if (errorHandleType == ErrorHandleType.rethrowError) {
-      rethrow;
-    } else {
-      return _requestHandleError<T>(
-        error,
-        stackTrace,
-        errorTitle: messageTitle,
-        errorMessage: errorMessage,
-      );
-    }
-  }
-}
-
-/// Internal method to handle success logging
-void _handleSuccess<T>(T? response, String? messageTitle) {
-  JoshLogger.logSuccess(
-    response: response,
-    successTitle: messageTitle,
-  );
-}
-
-/// Internal method to handle errors based on error handling type
-T? _handleError<T>(
-  Object error,
-  StackTrace? stackTrace,
-  ErrorHandleType errorHandleType, {
-  String? errorTitle,
-  String? errorMessage,
-  bool showLog = false,
-}) {
-  if (showLog) {
-    JoshLogger.logError(
-      error,
-      stackTrace,
-      errorTitle: errorTitle,
-      errorMessage: errorMessage,
+    JoshLogger.logResponseError(
+      errorMessage: 'Unknown Response Error',
+      error: error,
+      stackTrace: stackTrace,
     );
+    return StandardResponse(statusMessage: 'Unknown Response Error');
   }
-
-  switch (errorHandleType) {
-    case ErrorHandleType.returnNull:
-      return null;
-    default:
-      throw JoshException(error, errorTitle: errorTitle);
-  }
-}
-
-/// Internal method to handle request-specific errors
-T _requestHandleError<T>(
-  Object error,
-  StackTrace? stackTrace, {
-  String? errorTitle,
-  String? errorMessage,
-  bool showLog = false,
-}) {
-  if (showLog) {
-    JoshLogger.logError(
-      error,
-      stackTrace,
-      errorTitle: errorTitle,
-      errorMessage: errorMessage,
-    );
-  }
-
-  throw JoshException(error, errorTitle: errorTitle);
 }
