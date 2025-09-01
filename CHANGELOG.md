@@ -12,6 +12,26 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 - Additional utility functions
 - Extended documentation and examples
 
+## [1.2.0] - 2025-09-01
+
+### Changed
+- **Simplified API Structure**: Removed complex ErrorHandleType enum and JoshException for cleaner, more intuitive API
+- **Streamlined Error Handling**: Simplified to always return StandardResult/StandardResponse objects without throwing exceptions
+- **Unified Parameter Names**: Consistent use of `logTitle` parameter across all functions
+- **Reduced Complexity**: Removed unnecessary configuration options for better developer experience
+
+### Removed
+- **ErrorHandleType Enum**: Removed complex error handling strategies (returnNull, rethrowError, throwError)
+- **JoshException Class**: Removed custom exception class in favor of simple error logging
+- **messageTitle Parameter**: Unified to use `logTitle` parameter consistently
+- **Complex Error Handling Logic**: Simplified error handling to focus on logging and safe return values
+
+### Technical Improvements
+- **Cleaner Codebase**: Reduced complexity and improved maintainability
+- **Consistent API**: All functions follow the same simple pattern
+- **Better Developer Experience**: Less configuration needed for common use cases
+- **Simplified Documentation**: Easier to understand and implement
+
 ## [1.1.0] - 2025-08-28
 
 ### Added

@@ -116,38 +116,42 @@ class _MockPageState extends State<MockPage> {
   }
 
   Future<String> getCatchingJoshWithHttpOnJosh() async {
-    return await joshReq(
+    final standardResponse = await joshReq(
       () => http.get(Uri.parse(url)),
-      messageTitle: 'getCatchingJoshWithHttpOnJosh',
-    ).then((value) => value.body.toString());
+    );
+    return standardResponse.data?.toString() ?? 'No data';
   }
 
   Future<String?> getCatchingJoshWithDioOnJosh() async {
-    return await joshReq(
+    final standardResponse = await joshReq(
       () => dio.get(url),
-      messageTitle: 'getCatchingJoshWithDioOnJosh',
-    ).then((value) => value.data.toString());
+    );
+    return standardResponse.data?.toString();
   }
 
-
   String? getCatchingJoshWithPrefs() {
-    return joshSync(
+    final standardResult = joshSync(
       () => globalPrefs?.getString('haloText') ?? 'null 응답',
-      messageTitle: 'getCatchingJoshWithPrefs',
+      logTitle: 'getCatchingJoshWithPrefs',
+      showSuccessLog: true,
     );
+    return standardResult.data?.toString();
   }
 
   Future<bool?> setCatchingJoshWithPrefs() async {
-    return await joshAsync(
+    final standardResult = await joshAsync(
       () async => globalPrefs?.setString('haloText', 'JOSH88') ?? false,
-      messageTitle: 'setCatchingJoshWithPrefs',
+      logTitle: 'setCatchingJoshWithPrefs',
+      showSuccessLog: true,
     );
+    return standardResult.data as bool?;
   }
-
 
   /// Demonstrates traditional error handling without CatchingJosh
   /// Shows how complex and verbose traditional try-catch approach can be
   /// This is what you'd have to write without using our package
+  ///
+  /// Compare this with the simple joshReq() approach above!
   Future<String> traditionalErrorHandlingWithoutCatchingJosh() async {
     try {
       // Step 1: Make HTTP request
@@ -194,7 +198,6 @@ class _MockPageState extends State<MockPage> {
         debugPrint('HTTP Error: $errorMessage');
         return 'Error: $errorMessage';
       }
-
     } catch (e) {
       throw Exception(e);
     }
