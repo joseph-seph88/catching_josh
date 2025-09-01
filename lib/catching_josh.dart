@@ -3,7 +3,7 @@
 /// This package provides three core functions for handling errors gracefully:
 /// - [joshSync]: For synchronous operations
 /// - [joshAsync]: For asynchronous operations
-/// - [joshReq]: For HTTP/network requests
+/// - [joshReq]: For HTTP/network requests.
 ///
 /// Features include clean error logging, customizable error handling,
 /// and automatic response validation for network requests.
