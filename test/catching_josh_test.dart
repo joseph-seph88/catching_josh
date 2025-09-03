@@ -1,5 +1,7 @@
 import 'package:flutter_test/flutter_test.dart';
 import 'package:catching_josh/catching_josh.dart';
+import 'package:catching_josh/src/logger/josh_logger_internal.dart';
+import 'package:catching_josh/src/logger/josh_log_buffer.dart';
 
 void main() {
   group('Josh Functions Tests', () {
@@ -9,6 +11,7 @@ void main() {
         expect(result.data, equals('success'));
         expect(result.dataType, equals('String'));
         expect(result.errorMessage, isNull);
+        expect(result.isSuccess, equals(true));
       });
 
       test('joshSync - sync operation with error', () {
@@ -17,6 +20,7 @@ void main() {
         });
         expect(result.data, isNull);
         expect(result.errorMessage, isNull);
+        expect(result.isSuccess, equals(false));
       });
 
       test('joshSync - with logTitle', () {
@@ -35,6 +39,7 @@ void main() {
         );
         expect(result.data, isNull);
         expect(result.errorMessage, equals('Custom error message'));
+        expect(result.isSuccess, equals(false));
       });
 
       test('joshSync - enable success log', () {
@@ -180,6 +185,56 @@ void main() {
         });
         expect(requestResult.statusMessage, equals('Unknown Response Error'));
         expect(requestResult.data, isNull);
+      });
+    });
+
+    group('Logging System Tests', () {
+      test('JoshLogger - user-facing logging', () {
+        // Test that JoshLogger methods can be called without errors
+        expect(
+            () => JoshLogger.logResultError(
+                  error: 'Test error',
+                  errorTitle: 'Test',
+                  errorMessage: 'Test error message',
+                ),
+            returnsNormally);
+      });
+
+      test('JoshLoggerInternal - internal batch logging', () {
+        // Test that JoshLoggerInternal methods can be called without errors
+        expect(
+            () => JoshLoggerInternal.logResultError(
+                  error: 'Test error',
+                  errorTitle: 'Test',
+                  errorMessage: 'Test error message',
+                ),
+            returnsNormally);
+      });
+
+      test('JoshLogBuffer - buffer operations', () {
+        // Test buffer operations
+        final logEntry = LogEntry(
+          type: LogType.resultSuccess,
+          message: 'Test message',
+          level: 800,
+        );
+
+        expect(() => JoshLogBuffer.updateLog(logEntry), returnsNormally);
+        expect(() => JoshLogBuffer.flush(), returnsNormally);
+        expect(() => JoshLogBuffer.clear(), returnsNormally);
+      });
+
+      test('Dual logging system integration', () {
+        // Test that both logging systems work together
+        final result = joshSync(
+          () => 'test success',
+          logTitle: 'Integration Test',
+          showSuccessLog: true,
+          showErrorLog: true,
+        );
+
+        expect(result.isSuccess, equals(true));
+        expect(result.data, equals('test success'));
       });
     });
   });

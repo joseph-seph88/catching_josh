@@ -13,6 +13,8 @@ class StandardResponse {
   /// Type information of the response data
   final String? dataType;
 
+  final bool? isSuccess;
+
   /// Creates a StandardResponse instance
   ///
   /// [statusCode] - Optional HTTP status code
@@ -24,5 +26,6 @@ class StandardResponse {
     this.statusMessage,
     this.data,
     this.dataType,
+    this.isSuccess = false,
   });
 }

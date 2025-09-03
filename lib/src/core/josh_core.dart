@@ -1,10 +1,18 @@
+// Core system imports
 import 'package:catching_josh/src/handlers/result_handler.dart';
 import 'package:catching_josh/src/handlers/response_handler.dart';
 import 'package:catching_josh/src/models/standard_response.dart';
 import 'package:catching_josh/src/models/standard_result.dart';
-import 'package:catching_josh/src/logger/josh_logger.dart';
+
+// Internal batch logging system imports
+import 'package:catching_josh/src/logger/josh_log_buffer.dart';
+import 'package:catching_josh/src/logger/josh_logger_internal.dart';
 
 /// Core Functions for CatchingJosh package
+///
+/// Provides centralized error handling with internal batch logging system.
+/// All core functions use JoshLoggerInternal for buffered logging that gets
+/// flushed at the end of each operation for optimal performance.
 ///
 /// [joshSync] : Synchronous operations (file I/O, database operations)
 /// [joshAsync] : Asynchronous operations (file I/O, database operations, service calls)
@@ -38,15 +46,25 @@ StandardResult joshSync<T>(
       showSuccessLog: showSuccessLog,
       showErrorLog: showErrorLog,
     );
+
+    if (showSuccessLog || showErrorLog) {
+      JoshLogBuffer.flush();
+    }
+
     return standardResult;
   } catch (error, stackTrace) {
-    JoshLogger.logResultError(
+    JoshLoggerInternal.logResultError(
       error: error,
       stackTrace: stackTrace,
       errorTitle: logTitle,
       errorMessage: errorMessage,
     );
-    return StandardResult(errorMessage: errorMessage);
+    JoshLogBuffer.flush();
+
+    return StandardResult(
+      errorMessage: errorMessage,
+      isSuccess: false,
+    );
   }
 }
 
@@ -68,15 +86,24 @@ Future<StandardResult> joshAsync<T>(
       showErrorLog: showErrorLog,
     );
 
+    if (showSuccessLog || showErrorLog) {
+      JoshLogBuffer.flush();
+    }
+
     return standardResult;
   } catch (error, stackTrace) {
-    JoshLogger.logResultError(
+    JoshLoggerInternal.logResultError(
       error: error,
       stackTrace: stackTrace,
       errorTitle: logTitle,
       errorMessage: errorMessage,
     );
-    return StandardResult(errorMessage: errorMessage);
+    JoshLogBuffer.flush();
+
+    return StandardResult(
+      errorMessage: errorMessage,
+      isSuccess: false,
+    );
   }
 }
 
@@ -86,13 +113,20 @@ Future<StandardResponse> joshReq(
   try {
     final response = await function();
     final standardResponse = ResponseHandler.handleResponse(response);
+    JoshLogBuffer.flush();
+
     return standardResponse;
   } catch (error, stackTrace) {
-    JoshLogger.logResponseError(
+    JoshLoggerInternal.logResponseError(
       errorMessage: 'Unknown Response Error',
       error: error,
       stackTrace: stackTrace,
     );
-    return StandardResponse(statusMessage: 'Unknown Response Error');
+    JoshLogBuffer.flush();
+
+    return StandardResponse(
+      statusMessage: 'Unknown Response Error',
+      isSuccess: false,
+    );
   }
 }
