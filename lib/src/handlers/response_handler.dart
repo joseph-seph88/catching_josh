@@ -1,12 +1,20 @@
+// Handler system imports
 import 'package:catching_josh/catching_josh.dart';
+import 'package:catching_josh/src/logger/josh_logger_internal.dart';
 
 /// Handler class for processing HTTP responses and converting them to StandardResponse
 /// Supports different response types: Dio, HTTP, and custom responses
-class ResponseHandler {
+/// Uses JoshLoggerInternal for buffered logging that gets flushed by the calling Core
+sealed class ResponseHandler {
   /// Main method to handle any type of response and convert it to StandardResponse
   ///
-  /// [response] - The response object to process (can be Dio, HTTP, or custom type)
-  /// Returns a StandardResponse with standardized format and appropriate logging
+  /// This method processes various response types and logs them using the internal
+  /// batch logging system. Logs are buffered and will be flushed by the calling Core.
+  ///
+  /// Parameters:
+  /// - [response] - The response object to process (can be Dio, HTTP, or custom type)
+  ///
+  /// Returns a StandardResponse with standardized format and internal logging
   static StandardResponse handleResponse(dynamic response) {
     try {
       if (response == null) {
@@ -18,35 +26,49 @@ class ResponseHandler {
       } else {
         return _handleDefaultResponse(response);
       }
-    } catch (e, s) {
-      JoshLogger.logResponseError(error: e, stackTrace: s);
-      return StandardResponse(statusMessage: 'Unknown Response Error');
+    } catch (error, stackTrace) {
+      JoshLoggerInternal.logResponseError(error: error, stackTrace: stackTrace);
+      return StandardResponse(
+        statusMessage: error.toString(),
+        isSuccess: false,
+      );
     }
   }
 
-  /// Handles null responses
+  /// Handles null responses with internal batch logging
   ///
-  /// Returns a StandardResponse indicating null response with appropriate error logging
+  /// This method processes null responses and logs them using the internal
+  /// batch logging system. Logs are buffered and will be flushed by the calling Core.
+  ///
+  /// Returns a StandardResponse indicating null response with internal error logging
   static StandardResponse _handleNullResponse() {
-    JoshLogger.logResponseError(errorMessage: 'Response is Null');
-    return StandardResponse(statusMessage: 'Response is Null');
+    JoshLoggerInternal.logResponseError(errorMessage: 'Response is Null');
+    return StandardResponse(
+      statusMessage: 'Response is Null',
+      isSuccess: false,
+    );
   }
 
-  /// Handles custom/default responses that are not Dio or HTTP
+  /// Handles custom/default responses that are not Dio or HTTP with internal batch logging
   ///
-  /// [response] - The custom response object to process
-  /// Returns a StandardResponse with success/error determination based on response content
+  /// This method processes custom responses and logs them using the internal
+  /// batch logging system. Logs are buffered and will be flushed by the calling Core.
+  ///
+  /// Parameters:
+  /// - [response] - The custom response object to process
+  ///
+  /// Returns a StandardResponse with success/error determination and internal logging
   static StandardResponse _handleDefaultResponse(dynamic response) {
     final hasSuccessIndicator =
         ResponseTypeChecker.hasSuccessIndicator(response);
 
     if (hasSuccessIndicator) {
-      JoshLogger.logResponseSuccess(
+      JoshLoggerInternal.logResponseSuccess(
         successMessage: 'Response is Success',
         responseData: response,
       );
     } else {
-      JoshLogger.logResponseError(
+      JoshLoggerInternal.logResponseError(
         errorMessage: 'Response is Error',
         responseData: response,
       );
@@ -57,13 +79,19 @@ class ResponseHandler {
           hasSuccessIndicator ? 'Response is Success' : 'Response is Error',
       data: response,
       dataType: response.runtimeType.toString(),
+      isSuccess: hasSuccessIndicator,
     );
   }
 
-  /// Handles standard HTTP responses
+  /// Handles standard HTTP responses with internal batch logging
   ///
-  /// [response] - The HTTP response object to process
-  /// Returns a StandardResponse with HTTP-specific information (statusCode, reasonPhrase, body)
+  /// This method processes HTTP responses and logs them using the internal
+  /// batch logging system. Logs are buffered and will be flushed by the calling Core.
+  ///
+  /// Parameters:
+  /// - [response] - The HTTP response object to process
+  ///
+  /// Returns a StandardResponse with HTTP-specific information and internal logging
   static StandardResponse _handleHttpResponse(dynamic response) {
     final hasSuccessIndicator =
         ResponseTypeChecker.hasSuccessIndicator(response);
@@ -73,14 +101,14 @@ class ResponseHandler {
     final requestUri = response.request?.url;
 
     if (hasSuccessIndicator) {
-      JoshLogger.logResponseSuccess(
+      JoshLoggerInternal.logResponseSuccess(
         successMessage: statusMessage,
         statusCode: statusCode,
         responseData: responseData,
         requestUri: requestUri,
       );
     } else {
-      JoshLogger.logResponseError(
+      JoshLoggerInternal.logResponseError(
         errorMessage: statusMessage,
         statusCode: statusCode,
         responseData: responseData,
@@ -93,13 +121,19 @@ class ResponseHandler {
       statusCode: statusCode,
       data: responseData,
       dataType: responseData.runtimeType.toString(),
+      isSuccess: hasSuccessIndicator,
     );
   }
 
-  /// Handles Dio HTTP client responses
+  /// Handles Dio HTTP client responses with internal batch logging
   ///
-  /// [response] - The Dio response object to process
-  /// Returns a StandardResponse with Dio-specific information (statusCode, statusMessage, data)
+  /// This method processes Dio responses and logs them using the internal
+  /// batch logging system. Logs are buffered and will be flushed by the calling Core.
+  ///
+  /// Parameters:
+  /// - [response] - The Dio response object to process
+  ///
+  /// Returns a StandardResponse with Dio-specific information and internal logging
   static StandardResponse _handleDioResponse(dynamic response) {
     final hasSuccessIndicator =
         ResponseTypeChecker.hasSuccessIndicator(response);
@@ -110,7 +144,7 @@ class ResponseHandler {
     final responseUri = response.realUri;
 
     if (hasSuccessIndicator) {
-      JoshLogger.logResponseSuccess(
+      JoshLoggerInternal.logResponseSuccess(
         successMessage: statusMessage,
         statusCode: statusCode,
         responseData: responseData,
@@ -118,7 +152,7 @@ class ResponseHandler {
         responseUri: responseUri,
       );
     } else {
-      JoshLogger.logResponseError(
+      JoshLoggerInternal.logResponseError(
         errorMessage: statusMessage,
         statusCode: statusCode,
         responseData: responseData,
@@ -132,6 +166,7 @@ class ResponseHandler {
       statusCode: statusCode,
       data: responseData,
       dataType: responseData.runtimeType.toString(),
+      isSuccess: hasSuccessIndicator,
     );
   }
 }

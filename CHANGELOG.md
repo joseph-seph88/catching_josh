@@ -7,73 +7,47 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 
 ## [Unreleased]
 
-### Planned
-- Performance optimizations
-- Additional utility functions
-- Extended documentation and examples
+## [1.2.1] - 2025-09-04
+
+### Added
+- **Dual Logging System**: `JoshLogger` (user-facing) + `JoshLoggerInternal` (internal batch)
+- **Single Log Buffer**: `JoshLogBuffer` for efficient memory usage
+
+### Changed
+- **Batch Logging**: All handlers use `JoshLoggerInternal` with Core-controlled flushing
+- **Production Optimization**: Success logs disabled in production
+
+### Improved
+- **Documentation**: Clear comments explaining dual logging architecture
+- **Performance**: Batch logging reduces console output overhead
 
 ## [1.2.0] - 2025-09-01
 
 ### Changed
-- **Simplified API Structure**: Removed complex ErrorHandleType enum and JoshException for cleaner, more intuitive API
-- **Streamlined Error Handling**: Simplified to always return StandardResult/StandardResponse objects without throwing exceptions
-- **Unified Parameter Names**: Consistent use of `logTitle` parameter across all functions
-- **Reduced Complexity**: Removed unnecessary configuration options for better developer experience
+- **Simplified API**: Removed complex ErrorHandleType enum and JoshException
+- **Streamlined Error Handling**: Always return StandardResult/StandardResponse objects
+- **Unified Parameters**: Consistent use of `logTitle` parameter
 
 ### Removed
-- **ErrorHandleType Enum**: Removed complex error handling strategies (returnNull, rethrowError, throwError)
-- **JoshException Class**: Removed custom exception class in favor of simple error logging
-- **messageTitle Parameter**: Unified to use `logTitle` parameter consistently
-- **Complex Error Handling Logic**: Simplified error handling to focus on logging and safe return values
-
-### Technical Improvements
-- **Cleaner Codebase**: Reduced complexity and improved maintainability
-- **Consistent API**: All functions follow the same simple pattern
-- **Better Developer Experience**: Less configuration needed for common use cases
-- **Simplified Documentation**: Easier to understand and implement
+- **ErrorHandleType Enum**: Complex error handling strategies
+- **JoshException Class**: Custom exception class
+- **Complex Error Logic**: Simplified error handling
 
 ## [1.1.0] - 2025-08-28
 
 ### Added
-- **Enhanced Logging System**: Improved ResponseExtractor with debug-mode only logging using `developer.log`
-- **Configurable Cache Management**: Environment variable-based cache size configuration (`JOSH_LOGGER_MAX_CACHE_SIZE`)
-- **Accurate Memory Usage Calculation**: UTF-8 encoding based memory usage calculation for better monitoring
-- **Dynamic Cache Size Adjustment**: Runtime cache size adjustment capabilities
-- **Cache Statistics Monitoring**: Comprehensive cache statistics and performance monitoring
+- **Enhanced Logging**: Debug-mode only logging with `developer.log`
+- **Cache Management**: Environment variable-based cache configuration
+- **Memory Monitoring**: Accurate memory usage calculation
 
 ### Improved
-- **ResponseExtractor Error Handling**: Better error logging with consistent message format and English localization
-- **LogFormatter Performance**: Enhanced caching system with configurable limits and memory optimization
-- **Debug Mode Logging**: Production-safe logging using `assert()` blocks for development-only output
-- **Code Maintainability**: Unified logging approach with `_extractDebugLog()` helper method
-
-### Technical Enhancements
-- **Environment Variable Support**: `JOSH_LOGGER_MAX_CACHE_SIZE` for flexible cache configuration
-- **Memory Usage Accuracy**: Proper UTF-8 byte calculation instead of character count assumptions
-- **Runtime Cache Management**: `setMaxCacheSize()` method for dynamic cache size adjustment
-- **Performance Monitoring**: `cacheStats` getter for comprehensive cache performance insights
+- **LogFormatter Performance**: Enhanced caching system
+- **Error Handling**: Better error logging with consistent format
 
 ## [1.0.0+1] - 2025-08-25
 
 ### Added
 - Initial release of CatchingJosh package
-- Core error handling functions: `joshSync()`, `joshAsync()`, `joshReq()`
-- Flexible error handling with `ErrorHandleType` enum
-- clean formatted error logging system
-- HTTP response validation for network requests
-- Comprehensive test coverage for all core functions
-
-### Core Features
-- **`joshSync<T>()`** - Synchronous error handling with logging
-- **`joshAsync<T>()`** - Asynchronous error handling for Future operations
-- **`joshReq<T>()** - HTTP/network request handling with response validation
-- **Error handling types**: returnNull, rethrowError, throwError
-- **Customizable logging**: success/error log control
-- **Message titles and custom error messages**
-
-### Technical Details
-- Dart/Flutter package with zero external dependencies
-- clean box-formatted logging output
-- Stack trace extraction and formatting
-- HTTP response status validation
-- MIT License
+- Core functions: `joshSync()`, `joshAsync()`, `joshReq()`
+- Clean formatted error logging system
+- HTTP response validation

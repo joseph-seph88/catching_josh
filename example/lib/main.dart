@@ -157,49 +157,21 @@ class _MockPageState extends State<MockPage> {
       // Step 1: Make HTTP request
       final response = await http.get(Uri.parse(url));
 
-      // Step 2: Check HTTP status code manually
+      // Step 2: Check if request was successful (same logic as joshReq)
       if (response.statusCode >= 200 && response.statusCode < 300) {
-        final data = response.body;
-
-        // Step 3: Validate response data manually
-        if (data.toString().isEmpty) {
-          debugPrint(
-              'Warning: HTTP ${response.statusCode} success but response data is empty');
-          return 'Success but no data received';
-        }
-
-        // Step 4: Log success manually
-        debugPrint('HTTP ${response.statusCode} Success: $data');
-        return data.toString();
+        // Step 3: Log success manually
+        debugPrint('HTTP ${response.statusCode} Success: ${response.body}');
+        return response.body.toString();
       } else {
-        // Step 5: Handle different error status codes manually
-        String errorMessage;
-        switch (response.statusCode) {
-          case 400:
-            errorMessage = 'Bad Request (400)';
-            break;
-          case 401:
-            errorMessage = 'Unauthorized (401)';
-            break;
-          case 403:
-            errorMessage = 'Forbidden (403)';
-            break;
-          case 404:
-            errorMessage = 'Not Found (404)';
-            break;
-          case 500:
-            errorMessage = 'Internal Server Error (500)';
-            break;
-          default:
-            errorMessage = 'HTTP ${response.statusCode} Error';
-        }
-
-        // Step 6: Log error manually
-        debugPrint('HTTP Error: $errorMessage');
-        return 'Error: $errorMessage';
+        // Step 4: Log error manually
+        debugPrint(
+            'HTTP Error: ${response.statusCode} - ${response.reasonPhrase}');
+        return 'Error: ${response.reasonPhrase}';
       }
     } catch (e) {
-      throw Exception(e);
+      // Step 5: Handle exceptions manually
+      debugPrint('Exception: $e');
+      return 'Exception: $e';
     }
   }
 }

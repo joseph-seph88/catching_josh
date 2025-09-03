@@ -10,6 +10,8 @@ class StandardResult {
   /// Error message if the operation failed
   final String? errorMessage;
 
+  final bool? isSuccess;
+
   /// Creates a StandardResult instance
   ///
   /// [data] - Optional result data from the operation
@@ -19,5 +21,6 @@ class StandardResult {
     this.data,
     this.dataType,
     this.errorMessage,
+    this.isSuccess = false,
   });
 }

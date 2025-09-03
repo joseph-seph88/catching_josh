@@ -1,12 +1,13 @@
-// User-facing logging system imports
-import 'dart:developer' as developer;
+// Internal batch logging system imports
+import 'package:catching_josh/src/logger/josh_log_buffer.dart';
 import 'package:catching_josh/src/logger/utils/error_extractor.dart';
 import 'package:catching_josh/src/logger/utils/log_formatter.dart';
 
-/// User-facing logging class for CatchingJosh package
-/// Provides immediate logging capabilities with clean formatting
-/// Designed for direct user usage - outputs logs instantly
-class JoshLogger {
+/// Internal logger class for handling result and response logging operations
+/// Provides structured logging with formatted output for debugging and monitoring
+sealed class JoshLoggerInternal {
+  /// Checks if the current environment is production
+  /// Returns true if ENVIRONMENT is set to 'prod' or 'production'
   static bool get _isProduction {
     const environment =
         String.fromEnvironment('ENVIRONMENT', defaultValue: 'dev');
@@ -14,12 +15,18 @@ class JoshLogger {
   }
 
   /// Logs error information for async/sync operations with detailed formatting
-  /// Outputs immediately to console for debugging
   ///
-  /// [error] - The error object to log
-  /// [stackTrace] - Optional stack trace for debugging
-  /// [errorTitle] - Optional title for the error log
-  /// [errorMessage] - Optional custom error message
+  /// This method creates a formatted error log box containing:
+  /// - Error title and summary
+  /// - Custom error message (if provided)
+  /// - Error object details
+  /// - Stack trace with file and line information
+  ///
+  /// Parameters:
+  /// - [error] - The error object to log
+  /// - [stackTrace] - Optional stack trace for debugging
+  /// - [errorTitle] - Optional title for the error log
+  /// - [errorMessage] - Optional custom error message
   static void logResultError({
     Object? error,
     StackTrace? stackTrace,
@@ -49,15 +56,26 @@ class JoshLogger {
 
     logLines.add(LogFormatter.createBottomLine());
 
-    developer.log(logLines.join('\n'), level: 1000);
+    JoshLogBuffer.updateLog(LogEntry(
+      type: LogType.resultError,
+      message: logLines.join('\n'),
+      level: 1000,
+    ));
   }
 
   /// Logs success information for async/sync operations with detailed formatting
-  /// Outputs immediately to console (disabled in production)
   ///
-  /// [result] - The result object to log
-  /// [successTitle] - Optional title for the success log
-  /// [successMessage] - Optional custom success message
+  /// This method creates a formatted success log box containing:
+  /// - Success title and summary
+  /// - Custom success message (if provided)
+  /// - Result data and its type information
+  ///
+  /// Note: Success logs are disabled in production environment for performance
+  ///
+  /// Parameters:
+  /// - [result] - The result object to log
+  /// - [successTitle] - Optional title for the success log
+  /// - [successMessage] - Optional custom success message
   static void logResultSuccess({
     Object? result,
     String? successTitle,
@@ -85,19 +103,29 @@ class JoshLogger {
 
     logLines.add(LogFormatter.createBottomLine());
 
-    developer.log(logLines.join('\n'), level: 800);
+    JoshLogBuffer.updateLog(LogEntry(
+      type: LogType.resultSuccess,
+      message: logLines.join('\n'),
+      level: 800,
+    ));
   }
 
   /// Logs error information for HTTP responses with detailed formatting
-  /// Outputs immediately to console for debugging network issues
   ///
-  /// [errorMessage] - Optional custom error message
-  /// [statusCode] - Optional HTTP status code
-  /// [responseData] - Optional response data
-  /// [requestUri] - Optional request URI
-  /// [responseUri] - Optional response URI
-  /// [error] - Optional error object
-  /// [stackTrace] - Optional stack trace for debugging
+  /// This method creates a formatted error log box containing:
+  /// - Error object and stack trace information
+  /// - Custom error message (if provided)
+  /// - HTTP status code and URI information
+  /// - Response data details
+  ///
+  /// Parameters:
+  /// - [errorMessage] - Optional custom error message
+  /// - [statusCode] - Optional HTTP status code
+  /// - [responseData] - Optional response data
+  /// - [requestUri] - Optional request URI
+  /// - [responseUri] - Optional response URI
+  /// - [error] - Optional error object
+  /// - [stackTrace] - Optional stack trace for debugging
   static void logResponseError({
     String? errorMessage,
     int? statusCode,
@@ -147,17 +175,28 @@ class JoshLogger {
 
     logLines.add(LogFormatter.createBottomLine());
 
-    developer.log(logLines.join('\n'), level: 1000);
+    JoshLogBuffer.updateLog(LogEntry(
+      type: LogType.responseError,
+      message: logLines.join('\n'),
+      level: 1000,
+    ));
   }
 
   /// Logs success information for HTTP responses with detailed formatting
-  /// Outputs immediately to console (disabled in production)
   ///
-  /// [successMessage] - Optional custom success message
-  /// [statusCode] - Optional HTTP status code
-  /// [responseData] - Optional response data
-  /// [requestUri] - Optional request URI
-  /// [responseUri] - Optional response URI
+  /// This method creates a formatted success log box containing:
+  /// - Custom success message (if provided)
+  /// - HTTP status code and URI information
+  /// - Response data and its type information
+  ///
+  /// Note: Success logs are disabled in production environment for performance
+  ///
+  /// Parameters:
+  /// - [successMessage] - Optional custom success message
+  /// - [statusCode] - Optional HTTP status code
+  /// - [responseData] - Optional response data
+  /// - [requestUri] - Optional request URI
+  /// - [responseUri] - Optional response URI
   static void logResponseSuccess({
     String? successMessage,
     int? statusCode,
@@ -200,16 +239,10 @@ class JoshLogger {
 
     logLines.add(LogFormatter.createBottomLine());
 
-    developer.log(logLines.join('\n'), level: 800);
+    JoshLogBuffer.updateLog(LogEntry(
+      type: LogType.responseSuccess,
+      message: logLines.join('\n'),
+      level: 800,
+    ));
   }
 }
-
-/// Log level usage guide
-///
-/// Available log levels for developer.log:
-/// - level: 0      - Trace messages (lowest level)
-/// - level: 500    - Debug information
-/// - level: 800    - General information
-/// - level: 900    - Warning messages
-/// - level: 1000   - Error messages
-/// - level: 1200   - Fatal messages (highest level)
