@@ -2,18 +2,12 @@
 import 'package:catching_josh/src/logger/josh_log_buffer.dart';
 import 'package:catching_josh/src/logger/utils/error_extractor.dart';
 import 'package:catching_josh/src/logger/utils/log_formatter.dart';
+import 'package:catching_josh/src/logger/utils/environment_utils.dart';
 
 /// Internal logger class for handling result and response logging operations
 /// Provides structured logging with formatted output for debugging and monitoring
+/// Uses EnvironmentUtils for production/development environment detection
 sealed class JoshLoggerInternal {
-  /// Checks if the current environment is production
-  /// Returns true if ENVIRONMENT is set to 'prod' or 'production'
-  static bool get _isProduction {
-    const environment =
-        String.fromEnvironment('ENVIRONMENT', defaultValue: 'dev');
-    return environment == 'prod' || environment == 'production';
-  }
-
   /// Logs error information for async/sync operations with detailed formatting
   ///
   /// This method creates a formatted error log box containing:
@@ -81,7 +75,7 @@ sealed class JoshLoggerInternal {
     String? successTitle,
     String? successMessage,
   }) {
-    if (_isProduction) return;
+    if (EnvironmentUtils.isProduction) return;
 
     final logLines = <String>[];
 
@@ -204,7 +198,7 @@ sealed class JoshLoggerInternal {
     String? requestUri,
     String? responseUri,
   }) {
-    if (_isProduction) return;
+    if (EnvironmentUtils.isProduction) return;
 
     final logLines = <String>[];
 

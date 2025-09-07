@@ -2,15 +2,20 @@
 import 'dart:developer' as developer;
 import 'package:catching_josh/src/logger/utils/error_extractor.dart';
 import 'package:catching_josh/src/logger/utils/log_formatter.dart';
+import 'package:catching_josh/src/logger/utils/environment_utils.dart';
 
 /// User-facing logging class for CatchingJosh package
 /// Provides immediate logging capabilities with clean formatting
 /// Designed for direct user usage - outputs logs instantly
+/// Uses EnvironmentUtils for production/development environment detection
 class JoshLogger {
-  static bool get _isProduction {
-    const environment =
-        String.fromEnvironment('ENVIRONMENT', defaultValue: 'dev');
-    return environment == 'prod' || environment == 'production';
+  /// Creates a single formatted log line for error messages
+  /// Returns a formatted string that can be used for simple error logging
+  ///
+  /// [errorMessage] - The error message to format
+  /// Returns a formatted log line string
+  static String singleLogLine(String errorMessage) {
+    return LogFormatter.createContentLine('ErrorMessage', errorMessage);
   }
 
   /// Logs error information for async/sync operations with detailed formatting
@@ -63,7 +68,7 @@ class JoshLogger {
     String? successTitle,
     String? successMessage,
   }) {
-    if (_isProduction) return;
+    if (EnvironmentUtils.isProduction) return;
 
     final logLines = <String>[];
 
@@ -165,7 +170,7 @@ class JoshLogger {
     String? requestUri,
     String? responseUri,
   }) {
-    if (_isProduction) return;
+    if (EnvironmentUtils.isProduction) return;
 
     final logLines = <String>[];
 
