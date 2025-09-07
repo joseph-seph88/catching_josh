@@ -1,7 +1,7 @@
 # catching_josh
 
 **Author:** Joseph88  
-**Version:** 1.2.1  
+**Version:** 1.2.2
 **License:** MIT  
 **Git:** https://github.com/joseph-seph88/catching_josh
 
@@ -16,7 +16,7 @@
 
 ```yaml
 dependencies:
-  catching_josh: ^1.2.1
+  catching_josh: ^1.2.2
 ```
 
 ## Quick Start
@@ -52,7 +52,7 @@ class StandardResult {
   final bool? isSuccess;        // Success status
 }
 
-class StandardResponse {
+class StandardResDataponse {
   final int? statusCode;        // HTTP status code
   final String? statusMessage;  // HTTP status message
   final dynamic data;           // Response data
@@ -81,6 +81,7 @@ if (result.isSuccess == true) {
 ```dart
 final response = await joshReq(
   () async => http.get(Uri.parse('https://api.example.com/data')),
+  mockResponseOnCatch: {'error': 'Network unavailable'}, // Mock data for testing
 );
 
 if (response.isSuccess == true) {
@@ -103,6 +104,13 @@ if (user.isSuccess == true) {
 }
 ```
 
+### Simple Log Line
+```dart
+// Create a single formatted log line
+final logLine = JoshLogger.singleLogLine('Something went wrong');
+print(logLine); // Output: [ErrorMessage] Something went wrong
+```
+
 ## Features
 
 - **🎯 Purpose-specific methods**: `joshSync`, `joshAsync`, `joshReq`
@@ -110,6 +118,9 @@ if (user.isSuccess == true) {
 - **🔍 Automatic logging**: Clean formatted logs with stack traces
 - **⚡ Dual logging system**: User-facing + Internal batch logging
 - **🛡️ Production-safe**: Success logs disabled in production
+- **🧪 Testing support**: Mock data fallback for development environments
+- **🌍 Environment utils**: Centralized environment detection
+- **📝 Simple logging**: `singleLogLine()` for quick error message formatting
 - **🚀 Zero dependencies**: No external packages required
 
 ## Parameters
@@ -121,12 +132,27 @@ if (user.isSuccess == true) {
 | `errorMessage` | `String?` | ❌ | Custom error message |
 | `showSuccessLog` | `bool` | ❌ | Log success (default: false) |
 | `showErrorLog` | `bool` | ❌ | Log errors (default: false) |
+| `mockResponseOnCatch` | `dynamic` | ❌ | Mock data for testing (joshReq only) |
 
 ## Environment Variables
 
 | Variable | Description | Default |
 |----------|-------------|---------|
+| `ENVIRONMENT` | Environment mode (dev/prod/production) | dev |
 | `JOSH_LOGGER_MAX_CACHE_SIZE` | Log formatting cache size | 1000 |
+
+## Testing Support
+
+The `joshReq` function now supports mock data for testing:
+
+```dart
+// In development: returns mock data on error
+// In production: returns null on error
+final response = await joshReq(
+  () async => http.get(uri),
+  mockResponseOnCatch: {'test': 'data'},
+);
+```
 
 ## License
 

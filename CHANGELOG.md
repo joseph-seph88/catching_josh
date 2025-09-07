@@ -7,6 +7,24 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 
 ## [Unreleased]
 
+## [1.2.2] - 2025-09-07
+
+### Added
+- **Environment Utils**: Centralized environment detection with `EnvironmentUtils` class
+- **Mock Data Support**: `joshReq` now supports mock data fallback for testing
+- **Development-Only Mock**: Mock data only returned in development environments
+- **Single Log Line**: `JoshLogger.singleLogLine()` method for simple error message formatting
+
+### Changed
+- **Code Refactoring**: Removed duplicate `_isProduction` logic across logging classes
+- **Simplified joshReq**: Cleaner error handling with ternary operator
+- **Centralized Environment**: All environment checks now use `EnvironmentUtils`
+
+### Improved
+- **Code Quality**: Eliminated code duplication and improved maintainability
+- **Testing Support**: Better mock data handling for development and testing
+- **Documentation**: Updated comments to reflect new architecture
+
 ## [1.2.1] - 2025-09-04
 
 ### Added

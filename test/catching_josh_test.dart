@@ -2,6 +2,7 @@ import 'package:flutter_test/flutter_test.dart';
 import 'package:catching_josh/catching_josh.dart';
 import 'package:catching_josh/src/logger/josh_logger_internal.dart';
 import 'package:catching_josh/src/logger/josh_log_buffer.dart';
+import 'package:catching_josh/src/logger/utils/environment_utils.dart';
 
 void main() {
   group('Josh Functions Tests', () {
@@ -137,6 +138,19 @@ void main() {
         expect(result.data, isNull);
       });
 
+      test('joshReq - with mock data in development', () async {
+        final result = await joshReq(
+          () async {
+            await Future.delayed(Duration(milliseconds: 1));
+            throw Exception('Test request error');
+          },
+          mockResponseOnCatch: {'mock': 'data'},
+        );
+        expect(result.statusMessage, equals('Unknown Response Error'));
+        // In development environment, should return mock data
+        expect(result.data, isNotNull);
+      });
+
       test('joshReq - null response handling', () async {
         final result = await joshReq(() async {
           await Future.delayed(Duration(milliseconds: 1));
@@ -235,6 +249,32 @@ void main() {
 
         expect(result.isSuccess, equals(true));
         expect(result.data, equals('test success'));
+      });
+    });
+
+    group('New Features Tests', () {
+      test('JoshLogger.singleLogLine - creates formatted log line', () {
+        final logLine = JoshLogger.singleLogLine('Test error message');
+        expect(logLine, isA<String>());
+        expect(logLine, contains('ErrorMessage'));
+        expect(logLine, contains('Test error message'));
+      });
+
+      test('EnvironmentUtils - environment detection', () {
+        // Test environment detection methods
+        expect(EnvironmentUtils.isProduction, isA<bool>());
+        expect(EnvironmentUtils.isDevelopment, isA<bool>());
+        expect(EnvironmentUtils.currentEnvironment, isA<String>());
+
+        // In test environment, should be development
+        expect(EnvironmentUtils.isDevelopment, equals(true));
+        expect(EnvironmentUtils.isProduction, equals(false));
+      });
+
+      test('EnvironmentUtils - current environment string', () {
+        final env = EnvironmentUtils.currentEnvironment;
+        expect(env, isNotNull);
+        expect(env, isNotEmpty);
       });
     });
   });
