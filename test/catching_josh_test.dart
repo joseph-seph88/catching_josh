@@ -59,6 +59,18 @@ void main() {
         expect(result.data, isNull);
         expect(result.errorMessage, isNull);
       });
+
+      test('joshSync - returns mock data in development on error', () {
+        final result = joshSync(
+          () {
+            throw Exception('Sync error');
+          },
+          mockResultOnCatch: {'mock': 'sync'},
+        );
+        // In development environment, should return mock data
+        expect(result.data, isNotNull);
+        expect(result.isSuccess, equals(false));
+      });
     });
 
     group('joshAsync Tests', () {
@@ -116,6 +128,51 @@ void main() {
         expect(result.data, isNull);
         expect(result.errorMessage, isNull);
       });
+
+      test('joshAsync - returns mock data in development on error', () async {
+        final result = await joshAsync(
+          () async {
+            await Future.delayed(Duration(milliseconds: 1));
+            throw Exception('Async error');
+          },
+          mockResultOnCatch: {'mock': 'async'},
+        );
+        // In development environment, should return mock data
+        expect(result.data, isNotNull);
+        expect(result.isSuccess, equals(false));
+      });
+
+      test('joshAsync - pass-through StandardResult from inner call', () async {
+        final inner = await joshAsync(() async => 'inner');
+        // Now wrap the StandardResult again
+        final outer = await joshAsync(() async => inner);
+        expect(outer.data, equals('inner'));
+        expect(outer.isSuccess, equals(true));
+      });
+
+      test('joshAsync - attachOriginalErrorMessage populates errorMessage',
+          () async {
+        final res = await joshAsync(
+          () async {
+            throw Exception('Original async error');
+          },
+          attachOriginalErrorMessage: true,
+        );
+        expect(res.isSuccess, equals(false));
+        expect(res.errorMessage, contains('Original async error'));
+      });
+
+      test('joshAsync - rethrowOnError propagates exception', () async {
+        expect(
+          () => joshAsync(
+            () async {
+              throw Exception('Rethrow async error');
+            },
+            rethrowOnError: true,
+          ),
+          throwsA(isA<Exception>()),
+        );
+      });
     });
 
     group('joshReq Tests', () {
@@ -158,6 +215,46 @@ void main() {
         });
         expect(result.statusMessage, equals('Response is Null'));
         expect(result.data, isNull);
+      });
+
+      test('joshReq - pass-through StandardResponse from inner call', () async {
+        // Inner joshReq returns a successful StandardResponse
+        final inner = StandardResponse(
+          statusCode: 200,
+          statusMessage: 'OK',
+          data: 'ok',
+          dataType: 'String',
+          isSuccess: true,
+        );
+        final outer = await joshReq(() async => inner);
+        expect(outer.data, equals('ok'));
+        expect(outer.isSuccess, equals(true));
+      });
+
+      test(
+          'joshReq - attachOriginalErrorMessage appends error to statusMessage',
+          () async {
+        final res = await joshReq(
+          () async {
+            throw Exception('Request exploded');
+          },
+          attachOriginalErrorMessage: true,
+        );
+        expect(res.isSuccess, equals(false));
+        expect(res.statusMessage, contains('Unknown Response Error'));
+        expect(res.statusMessage, contains('Request exploded'));
+      });
+
+      test('joshReq - rethrowOnError propagates exception', () async {
+        expect(
+          () => joshReq(
+            () async {
+              throw Exception('Rethrow request error');
+            },
+            rethrowOnError: true,
+          ),
+          throwsA(isA<Exception>()),
+        );
       });
     });
 
@@ -249,6 +346,63 @@ void main() {
 
         expect(result.isSuccess, equals(true));
         expect(result.data, equals('test success'));
+      });
+
+      test('Scoped logging - basic begin/flushAll/end', () {
+        // Begin scope and accumulate logs
+        JoshLogBuffer.beginScope();
+        expect(JoshLogBuffer.inScope, isTrue);
+
+        // Add multiple entries
+        JoshLogBuffer.updateLog(LogEntry(
+          type: LogType.resultSuccess,
+          message: 'First',
+          level: 800,
+        ));
+        JoshLogBuffer.updateLog(LogEntry(
+          type: LogType.responseError,
+          message: 'Second',
+          level: 1000,
+        ));
+
+        // flush() is no-op inside scope
+        expect(() => JoshLogBuffer.flush(), returnsNormally);
+
+        // flushAll should emit and clear current scope logs
+        expect(() => JoshLogBuffer.flushAll(), returnsNormally);
+
+        // End scope (nothing left to emit)
+        expect(() => JoshLogBuffer.endScope(), returnsNormally);
+        expect(JoshLogBuffer.inScope, isFalse);
+      });
+
+      test('Scoped logging - nested scopes and discard', () {
+        JoshLogBuffer.beginScope();
+        expect(JoshLogBuffer.inScope, isTrue);
+
+        JoshLogBuffer.updateLog(LogEntry(
+          type: LogType.resultError,
+          message: 'Outer-1',
+          level: 1000,
+        ));
+
+        // Inner scope
+        JoshLogBuffer.beginScope();
+        JoshLogBuffer.updateLog(LogEntry(
+          type: LogType.responseSuccess,
+          message: 'Inner-1',
+          level: 800,
+        ));
+
+        // Flush just inner logs without closing scopes
+        expect(() => JoshLogBuffer.flushAll(), returnsNormally);
+
+        // Discard inner scope logs (already flushedAll, so nothing left)
+        expect(() => JoshLogBuffer.endScope(flush: false), returnsNormally);
+
+        // End outer scope with flush (should only emit 'Outer-1')
+        expect(() => JoshLogBuffer.endScope(), returnsNormally);
+        expect(JoshLogBuffer.inScope, isFalse);
       });
     });
 

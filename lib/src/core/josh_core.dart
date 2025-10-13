@@ -26,6 +26,7 @@ import 'package:catching_josh/src/logger/utils/environment_utils.dart';
 /// [showSuccessLog] : (Optional) Whether to log success (default: false)
 /// [showErrorLog] : (Optional) Whether to log errors (default: false)
 /// [mockResponseOnCatch] : (Optional) Mock data to return in development when errors occur
+/// [mockResultOnCatch] : (Optional) Mock data to return in development for sync/async when errors occur
 ///
 /// Return Types:
 /// - joshSync: `StandardResult`
@@ -38,9 +39,19 @@ StandardResult joshSync<T>(
   String? errorMessage,
   bool showSuccessLog = false,
   bool showErrorLog = false,
+  dynamic mockResultOnCatch,
+  bool rethrowOnError = false,
+  bool attachOriginalErrorMessage = false,
 }) {
   try {
     final result = function();
+
+    if (result is StandardResult) {
+      if (showSuccessLog || showErrorLog) {
+        JoshLogBuffer.flush();
+      }
+      return result;
+    }
     final standardResult = ResultHandler.syncHandleResult(
       result: result,
       logTitle: logTitle,
@@ -55,6 +66,7 @@ StandardResult joshSync<T>(
 
     return standardResult;
   } catch (error, stackTrace) {
+    if (rethrowOnError) rethrow;
     JoshLoggerInternal.logResultError(
       error: error,
       stackTrace: stackTrace,
@@ -64,7 +76,9 @@ StandardResult joshSync<T>(
     JoshLogBuffer.flush();
 
     return StandardResult(
-      errorMessage: errorMessage,
+      data: EnvironmentUtils.isDevelopment ? mockResultOnCatch : null,
+      errorMessage: errorMessage ??
+          (attachOriginalErrorMessage ? error.toString() : null),
       isSuccess: false,
     );
   }
@@ -76,9 +90,19 @@ Future<StandardResult> joshAsync<T>(
   String? errorMessage,
   bool showSuccessLog = false,
   bool showErrorLog = false,
+  dynamic mockResultOnCatch,
+  bool rethrowOnError = false,
+  bool attachOriginalErrorMessage = false,
 }) async {
   try {
     final result = await function();
+
+    if (result is StandardResult) {
+      if (showSuccessLog || showErrorLog) {
+        JoshLogBuffer.flush();
+      }
+      return result;
+    }
 
     final standardResult = ResultHandler.asyncHandleResult(
       result: result,
@@ -94,6 +118,7 @@ Future<StandardResult> joshAsync<T>(
 
     return standardResult;
   } catch (error, stackTrace) {
+    if (rethrowOnError) rethrow;
     JoshLoggerInternal.logResultError(
       error: error,
       stackTrace: stackTrace,
@@ -103,7 +128,9 @@ Future<StandardResult> joshAsync<T>(
     JoshLogBuffer.flush();
 
     return StandardResult(
-      errorMessage: errorMessage,
+      data: EnvironmentUtils.isDevelopment ? mockResultOnCatch : null,
+      errorMessage: errorMessage ??
+          (attachOriginalErrorMessage ? error.toString() : null),
       isSuccess: false,
     );
   }
@@ -118,14 +145,22 @@ Future<StandardResult> joshAsync<T>(
 Future<StandardResponse> joshReq(
   Future<dynamic> Function() function, {
   dynamic mockResponseOnCatch,
+  bool rethrowOnError = false,
+  bool attachOriginalErrorMessage = false,
 }) async {
   try {
     final response = await function();
+    
+    if (response is StandardResponse) {
+      JoshLogBuffer.flush();
+      return response;
+    }
     final standardResponse = ResponseHandler.handleResponse(response);
     JoshLogBuffer.flush();
 
     return standardResponse;
   } catch (error, stackTrace) {
+    if (rethrowOnError) rethrow;
     JoshLoggerInternal.logResponseError(
       errorMessage: 'Unknown Response Error',
       error: error,
@@ -134,7 +169,9 @@ Future<StandardResponse> joshReq(
     JoshLogBuffer.flush();
 
     return StandardResponse(
-      statusMessage: 'Unknown Response Error',
+      statusMessage: attachOriginalErrorMessage
+          ? 'Unknown Response Error: ${error.toString()}'
+          : 'Unknown Response Error',
       data: EnvironmentUtils.isDevelopment ? mockResponseOnCatch : null,
       isSuccess: false,
     );
