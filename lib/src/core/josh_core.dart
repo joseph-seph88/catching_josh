@@ -150,7 +150,7 @@ Future<StandardResponse> joshReq(
 }) async {
   try {
     final response = await function();
-    
+
     if (response is StandardResponse) {
       JoshLogBuffer.flush();
       return response;
