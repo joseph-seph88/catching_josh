@@ -1,11 +1,12 @@
 name: catching_josh
 description: "A Flutter package that makes try-catch operations elegant and customizable with clean error logging and flexible error handling options."
-version: 1.2.2
+version: 1.2.4
 repository: https://github.com/joseph-seph88/catching_josh
+issue_tracker: https://github.com/joseph-seph88/catching_josh/issues
 
 environment:
-  sdk: ^3.6.0
-  flutter: ">=3.16.0"
+  sdk: ">=3.0.0 <4.0.0"
+  flutter: ">=3.10.0"
 
 dependencies:
   flutter:
@@ -15,5 +16,6 @@ dev_dependencies:
   flutter_test:
     sdk: flutter
   flutter_lints: ^5.0.0
+  test: ^1.25.0
 
 flutter:

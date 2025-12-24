@@ -7,6 +7,35 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 
 ## [Unreleased]
 
+## [1.2.4] - 2025-12-24
+
+### Changed
+- SDK: `^3.6.0` → `>=3.0.0 <4.0.0` (broader compatibility)
+- Flutter: `>=3.16.0` → `>=3.10.0`
+
+### Added
+- Test package in dev_dependencies for proper testing infrastructure
+
+### Improved
+- README with clearer examples and value proposition
+- Code formatting verified
+
+
+## [1.2.3] - 2025-10-13
+
+### Added
+- **Scoped Batch Logging**: `JoshLogBuffer` now supports scoped batch logging with `beginScope`, `endScope`, and `flushAll` for grouped log emission.
+- **Pass-Through Logic**: Chained `joshReq`/`joshAsync` calls now support pass-through for `StandardResult`/`StandardResponse` objects.
+- **Error Propagation Flags**: Optional `rethrowOnError` and `attachOriginalErrorMessage` flags for fine-grained error handling in core methods.
+- **Unit Tests**: Added tests for chaining, pass-through, and scoped logging behaviors.
+
+### Changed
+- **Error Propagation**: Improved error and log propagation in chained core calls; more predictable and robust handling.
+- **Documentation**: Updated README with new usage examples and logging features.
+
+### Fixed
+- **Test Reliability**: Fixed test failures related to pass-through and batch logging edge cases.
+
 ## [1.2.2] - 2025-09-07
 
 ### Added
